@@ -1,5 +1,11 @@
 export type CatLocation = 'big_room' | 'quarantine' | 'kids_room' | 'foster_home';
 
+export interface Patron {
+  name: string;
+  since: string;   // ISO date
+  origin: string;  // where they found/came from
+}
+
 export interface Cat {
   id: string;
   name: string;
@@ -12,6 +18,7 @@ export interface Cat {
   location?: CatLocation;
   origin?: string;
   history?: string;
+  patron?: Patron;
   notes?: string;
   createdAt: string;
 }

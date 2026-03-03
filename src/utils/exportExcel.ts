@@ -43,6 +43,9 @@ export function exportToExcel(): void {
     'Колір': c.color,
     'Нотатки': c.notes ?? '',
     'Історія': c.history ?? '',
+    'Патрон': c.patron?.name ?? '',
+    'Патрон — дата патронажу': c.patron?.since ? formatDate(c.patron.since) : '',
+    'Патрон — звідки дізнались': c.patron?.origin ?? '',
     'Додано': formatDate(c.createdAt),
   }));
 

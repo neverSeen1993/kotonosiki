@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Cat, CatLocation } from '../../types';
+import { Cat, CatLocation, Patron } from '../../types';
 
 const schema = z.object({
   name: z.string().min(1, "Ім'я обов'язкове"),
@@ -14,6 +14,9 @@ const schema = z.object({
   location: z.enum(['big_room', 'quarantine', 'kids_room', 'foster_home']).optional(),
   origin: z.string().optional(),
   history: z.string().optional(),
+  patronName: z.string().optional(),
+  patronSince: z.string().optional(),
+  patronOrigin: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -44,6 +47,9 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           location: initialData.location,
           origin: initialData.origin ?? '',
           history: initialData.history ?? '',
+          patronName: initialData.patron?.name ?? '',
+          patronSince: initialData.patron?.since ?? '',
+          patronOrigin: initialData.patron?.origin ?? '',
           notes: initialData.notes ?? '',
         }
       : { sex: 'female' },
@@ -61,6 +67,9 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       location: data.location as CatLocation | undefined,
       origin: data.origin || undefined,
       history: data.history || undefined,
+      patron: data.patronName
+        ? ({ name: data.patronName, since: data.patronSince ?? '', origin: data.patronOrigin ?? '' } as Patron)
+        : undefined,
       notes: data.notes || undefined,
     });
   };
@@ -148,6 +157,35 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           rows={4}
           placeholder="Розкажіть про минуле кота, його характер, звички..."
         />
+      </div>
+
+      {/* Patron section */}
+      <div className="border-t border-gray-100 pt-4">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Патрон</p>
+        <div className="space-y-3">
+          <div>
+            <label className="label">Ім'я патрона</label>
+            <input
+              {...register('patronName')}
+              className="input"
+              placeholder="Ім'я та прізвище"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label">Дата патронажу</label>
+              <input type="date" {...register('patronSince')} className="input" />
+            </div>
+            <div>
+              <label className="label">Звідки дізнались</label>
+              <input
+                {...register('patronOrigin')}
+                className="input"
+                placeholder="Соцмережі, знайомі..."
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div>

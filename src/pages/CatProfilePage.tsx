@@ -9,7 +9,7 @@ import CatForm from '../components/cats/CatForm';
 import RecordList from '../components/records/RecordList';
 import Modal from '../components/ui/Modal';
 import { formatAge, formatDate, daysSince } from '../utils/dateUtils';
-import { ArrowLeft, Edit2, Trash2, Stethoscope, Syringe, Calendar } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Stethoscope, Syringe, Calendar, Heart } from 'lucide-react';
 
 const locationLabel: Record<string, string> = {
   big_room: 'Велика кімната',
@@ -146,6 +146,30 @@ export default function CatProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Patron */}
+      {cat.patron?.name ? (
+        <div className="card mb-6 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Heart size={15} className="text-pink-500" />
+            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Патрон</h2>
+          </div>
+          <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500">
+            <span><span className="font-medium">Ім'я:</span> {cat.patron.name}</span>
+            {cat.patron.since && (
+              <span><span className="font-medium">Патронує з:</span> {formatDate(cat.patron.since)}</span>
+            )}
+            {cat.patron.origin && (
+              <span><span className="font-medium">Звідки дізнались:</span> {cat.patron.origin}</span>
+            )}
+          </div>
+        </div>
+      ) : isAdmin && (
+        <div className="card mb-6 p-4 border-dashed border-2 border-gray-200 flex items-center gap-3 text-gray-400 text-sm">
+          <Heart size={15} className="text-gray-300" />
+          Патрон не призначений — натисніть «Редагувати», щоб додати
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-1 mb-6 overflow-x-auto pb-1">
