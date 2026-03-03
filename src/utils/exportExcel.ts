@@ -50,6 +50,12 @@ export function exportToExcel(): void {
     'Патрон — звідки дізнались': c.patron?.origin ?? '',
     'Патрон — Instagram': c.patron?.instagram ?? '',
     'Патрон — телефон': c.patron?.phone ?? '',
+    'Адопція — дата': c.adoption?.date ? formatDate(c.adoption.date) : '',
+    'Адопція — звідки': c.adoption?.from ?? '',
+    'Адопція — email': c.adoption?.email ?? '',
+    'Адопція — телефон 1': c.adoption?.phone1 ?? '',
+    'Адопція — телефон 2': c.adoption?.phone2 ?? '',
+    'Адопція — Instagram': c.adoption?.instagram ?? '',
     'Додано': formatDate(c.createdAt),
   }));
 

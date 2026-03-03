@@ -9,7 +9,7 @@ import CatForm from '../components/cats/CatForm';
 import RecordList from '../components/records/RecordList';
 import Modal from '../components/ui/Modal';
 import { formatAge, formatDate, daysSince } from '../utils/dateUtils';
-import { ArrowLeft, Edit2, Trash2, Stethoscope, Syringe, Calendar, Heart } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Stethoscope, Syringe, Calendar, Heart, Home } from 'lucide-react';
 
 const locationLabel: Record<string, string> = {
   big_room: 'Велика кімната',
@@ -190,6 +190,44 @@ export default function CatProfilePage() {
           Патрон не призначений — натисніть «Редагувати», щоб додати
         </div>
       )}
+
+      {/* Adoption */}
+      {cat.adoption?.date || cat.adoption?.from ? (
+        <div className="card mb-6 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Home size={15} className="text-teal-500" />
+            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Адопція</h2>
+          </div>
+          <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500">
+            {cat.adoption.date && (
+              <span><span className="font-medium">Дата адопції:</span> {formatDate(cat.adoption.date)}</span>
+            )}
+            {cat.adoption.from && (
+              <span><span className="font-medium">Звідки взяли:</span> {cat.adoption.from}</span>
+            )}
+            {cat.adoption.email && (
+              <span><span className="font-medium">Email:</span>{' '}
+                <a href={`mailto:${cat.adoption.email}`} className="text-teal-600 hover:underline">{cat.adoption.email}</a>
+              </span>
+            )}
+            {cat.adoption.phone1 && (
+              <span><span className="font-medium">Телефон 1:</span>{' '}
+                <a href={`tel:${cat.adoption.phone1}`} className="text-teal-600 hover:underline">{cat.adoption.phone1}</a>
+              </span>
+            )}
+            {cat.adoption.phone2 && (
+              <span><span className="font-medium">Телефон 2:</span>{' '}
+                <a href={`tel:${cat.adoption.phone2}`} className="text-teal-600 hover:underline">{cat.adoption.phone2}</a>
+              </span>
+            )}
+            {cat.adoption.instagram && (
+              <span><span className="font-medium">Instagram:</span>{' '}
+                <a href={`https://instagram.com/${cat.adoption.instagram.replace('@','')}`} target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">{cat.adoption.instagram}</a>
+              </span>
+            )}
+          </div>
+        </div>
+      ) : null}
 
       {/* Tabs */}
       <div className="flex gap-1 mb-6 overflow-x-auto pb-1">

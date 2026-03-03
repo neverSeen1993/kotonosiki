@@ -10,6 +10,15 @@ export interface Patron {
 
 export type TestResult = 'positive' | 'negative';
 
+export interface Adoption {
+  date: string;          // ISO date
+  from: string;          // how/where adopted from
+  email?: string;
+  phone1?: string;
+  phone2?: string;
+  instagram?: string;
+}
+
 export interface Cat {
   id: string;
   name: string;
@@ -25,6 +34,7 @@ export interface Cat {
   fiv?: TestResult;
   felv?: TestResult;
   patron?: Patron;
+  adoption?: Adoption;
   notes?: string;
   createdAt: string;
 }

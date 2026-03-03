@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Cat, CatLocation, Patron, TestResult } from '../../types';
+import { Cat, CatLocation, Patron, TestResult, Adoption } from '../../types';
 
 const schema = z.object({
   name: z.string().min(1, "Ім'я обов'язкове"),
@@ -21,6 +21,12 @@ const schema = z.object({
   patronOrigin: z.string().optional(),
   patronInstagram: z.string().optional(),
   patronPhone: z.string().optional(),
+  adoptionDate: z.string().optional(),
+  adoptionFrom: z.string().optional(),
+  adoptionEmail: z.string().optional(),
+  adoptionPhone1: z.string().optional(),
+  adoptionPhone2: z.string().optional(),
+  adoptionInstagram: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -58,6 +64,12 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           patronOrigin: initialData.patron?.origin ?? '',
           patronInstagram: initialData.patron?.instagram ?? '',
           patronPhone: initialData.patron?.phone ?? '',
+          adoptionDate: initialData.adoption?.date ?? '',
+          adoptionFrom: initialData.adoption?.from ?? '',
+          adoptionEmail: initialData.adoption?.email ?? '',
+          adoptionPhone1: initialData.adoption?.phone1 ?? '',
+          adoptionPhone2: initialData.adoption?.phone2 ?? '',
+          adoptionInstagram: initialData.adoption?.instagram ?? '',
           notes: initialData.notes ?? '',
         }
       : { sex: 'female' },
@@ -79,6 +91,9 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       felv: data.felv as TestResult | undefined,
       patron: data.patronName
         ? ({ name: data.patronName, since: data.patronSince ?? '', origin: data.patronOrigin ?? '', instagram: data.patronInstagram || undefined, phone: data.patronPhone || undefined } as Patron)
+        : undefined,
+      adoption: data.adoptionDate || data.adoptionFrom
+        ? ({ date: data.adoptionDate ?? '', from: data.adoptionFrom ?? '', email: data.adoptionEmail || undefined, phone1: data.adoptionPhone1 || undefined, phone2: data.adoptionPhone2 || undefined, instagram: data.adoptionInstagram || undefined } as Adoption)
         : undefined,
       notes: data.notes || undefined,
     });
@@ -231,6 +246,41 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
                 placeholder="+380..."
               />
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Adoption section */}
+      <div className="border-t border-gray-100 pt-4">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Адопція</p>
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label">Дата адопції</label>
+              <input type="date" {...register('adoptionDate')} className="input" />
+            </div>
+            <div>
+              <label className="label">Звідки взяли</label>
+              <input {...register('adoptionFrom')} className="input" placeholder="Притулок, виставка..." />
+            </div>
+          </div>
+          <div>
+            <label className="label">Email</label>
+            <input {...register('adoptionEmail')} className="input" placeholder="adopter@email.com" type="email" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label">Телефон 1</label>
+              <input {...register('adoptionPhone1')} className="input" placeholder="+380..." />
+            </div>
+            <div>
+              <label className="label">Телефон 2</label>
+              <input {...register('adoptionPhone2')} className="input" placeholder="+380..." />
+            </div>
+          </div>
+          <div>
+            <label className="label">Instagram</label>
+            <input {...register('adoptionInstagram')} className="input" placeholder="@username" />
           </div>
         </div>
       </div>
