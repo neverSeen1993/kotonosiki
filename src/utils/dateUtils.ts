@@ -1,4 +1,4 @@
-import { format, parseISO, differenceInYears, differenceInMonths, isPast, isToday, isFuture, addDays } from 'date-fns';
+import { format, parseISO, differenceInYears, differenceInMonths, differenceInDays, isPast, isToday, isFuture, addDays } from 'date-fns';
 import { uk } from 'date-fns/locale';
 
 export function formatDate(isoDate: string): string {
@@ -56,3 +56,8 @@ export function isDueSoon(date: string, days = 7): boolean {
 export function today(): string {
   return format(new Date(), 'yyyy-MM-dd');
 }
+
+export function daysSince(isoDate: string): number {
+  return differenceInDays(new Date(), parseISO(isoDate));
+}
+

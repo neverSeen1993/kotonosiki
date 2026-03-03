@@ -8,7 +8,7 @@ import CatAvatar from '../components/cats/CatAvatar';
 import CatForm from '../components/cats/CatForm';
 import RecordList from '../components/records/RecordList';
 import Modal from '../components/ui/Modal';
-import { formatAge, formatDate } from '../utils/dateUtils';
+import { formatAge, formatDate, daysSince } from '../utils/dateUtils';
 import { ArrowLeft, Edit2, Trash2, Stethoscope, Syringe, Calendar } from 'lucide-react';
 
 const locationLabel: Record<string, string> = {
@@ -107,6 +107,8 @@ export default function CatProfilePage() {
                 {cat.arrivalDate && (
                   <span>
                     <span className="font-medium">Дата прибуття:</span> {formatDate(cat.arrivalDate)}
+                    {' '}
+                    <span className="text-teal-600 font-medium">({daysSince(cat.arrivalDate)} дн.)</span>
                   </span>
                 )}
                 <span>

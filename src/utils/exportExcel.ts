@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { loadCats, loadRecords } from './localStorage';
-import { formatDate } from './dateUtils';
+import { formatDate, daysSince } from './dateUtils';
 
 const typeLabel: Record<string, string> = {
   procedure: 'Процедура',
@@ -37,6 +37,7 @@ export function exportToExcel(): void {
     'Стать': sexLabel[c.sex] ?? c.sex,
     'Дата народження': formatDate(c.birthDate),
     'Дата прибуття': c.arrivalDate ? formatDate(c.arrivalDate) : '',
+    'Днів з прибуття': c.arrivalDate ? daysSince(c.arrivalDate) : '',
     'Місцезнаходження': c.location ? (locationLabel[c.location] ?? c.location) : '',
     'Колір': c.color,
     'Нотатки': c.notes ?? '',
