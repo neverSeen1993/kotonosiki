@@ -23,7 +23,6 @@ export default function CatCard({ cat }: CatCardProps) {
           <CatAvatar cat={cat} size="lg" />
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-800 text-lg truncate">{cat.name}</h3>
-            <p className="text-sm text-gray-500 truncate">{cat.breed}</p>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs text-gray-400">{formatAge(cat.birthDate)}</span>
               <span className="w-1 h-1 rounded-full bg-gray-300" />
