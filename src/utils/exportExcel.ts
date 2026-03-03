@@ -42,6 +42,7 @@ export function exportToExcel(): void {
     'Звідки': c.origin ?? '',
     'Колір': c.color,
     'Нотатки': c.notes ?? '',
+    'Історія': c.history ?? '',
     'Додано': formatDate(c.createdAt),
   }));
 

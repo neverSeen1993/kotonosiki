@@ -13,6 +13,7 @@ const schema = z.object({
   arrivalDate: z.string().optional(),
   location: z.enum(['big_room', 'quarantine', 'kids_room', 'foster_home']).optional(),
   origin: z.string().optional(),
+  history: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -42,6 +43,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           arrivalDate: initialData.arrivalDate ?? '',
           location: initialData.location,
           origin: initialData.origin ?? '',
+          history: initialData.history ?? '',
           notes: initialData.notes ?? '',
         }
       : { sex: 'female' },
@@ -58,6 +60,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       arrivalDate: data.arrivalDate || undefined,
       location: data.location as CatLocation | undefined,
       origin: data.origin || undefined,
+      history: data.history || undefined,
       notes: data.notes || undefined,
     });
   };
@@ -134,6 +137,16 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           {...register('origin')}
           className="input"
           placeholder="Притулок, вулиця, інший розплідник..."
+        />
+      </div>
+
+      <div>
+        <label className="label">Історія кота</label>
+        <textarea
+          {...register('history')}
+          className="input resize-none"
+          rows={4}
+          placeholder="Розкажіть про минуле кота, його характер, звички..."
         />
       </div>
 

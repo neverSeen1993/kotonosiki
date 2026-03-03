@@ -11,6 +11,7 @@ export interface Cat {
   arrivalDate?: string;
   location?: CatLocation;
   origin?: string;
+  history?: string;
   notes?: string;
   createdAt: string;
 }
