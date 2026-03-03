@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useCatsStore } from '../store/catsStore';
 import { useRecordsStore } from '../store/recordsStore';
+import { useAuth } from '../hooks/useAuth';
 import { Cat } from '../types';
 import CatAvatar from '../components/cats/CatAvatar';
 import CatForm from '../components/cats/CatForm';
@@ -17,6 +18,7 @@ export default function CatProfilePage() {
   const navigate = useNavigate();
   const { getCatById, updateCat, deleteCat } = useCatsStore();
   const { deleteRecordsByCat } = useRecordsStore();
+  const { isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('procedures');
   const [showEdit, setShowEdit] = useState(false);
 
@@ -69,18 +71,22 @@ export default function CatProfilePage() {
                   <p className="text-gray-500">{cat.breed}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setShowEdit(true)}
-                    className="btn-secondary text-sm py-1.5 px-3"
-                  >
-                    <Edit2 size={14} /> Редагувати
-                  </button>
-                  <button
-                    onClick={handleDelete}
-                    className="btn-danger text-sm py-1.5 px-3"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  {isAdmin && (
+                    <>
+                      <button
+                        onClick={() => setShowEdit(true)}
+                        className="btn-secondary text-sm py-1.5 px-3"
+                      >
+                        <Edit2 size={14} /> Редагувати
+                      </button>
+                      <button
+                        onClick={handleDelete}
+                        className="btn-danger text-sm py-1.5 px-3"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -131,7 +137,7 @@ export default function CatProfilePage() {
         {activeTab === 'appointments' && <RecordList catId={cat.id} type="appointment" />}
       </div>
 
-      {showEdit && (
+      {isAdmin && showEdit && (
         <Modal title={`Редагувати ${cat.name}`} onClose={() => setShowEdit(false)}>
           <CatForm initialData={cat} onSubmit={handleUpdate} onCancel={() => setShowEdit(false)} />
         </Modal>

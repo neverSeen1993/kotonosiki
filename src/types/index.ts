@@ -26,3 +26,20 @@ export interface MedicalRecord {
   nextDueDate?: string;
   createdAt: string;
 }
+
+export type UserRole = 'admin' | 'helper';
+
+export interface User {
+  id: string;
+  name: string;
+  login: string;
+  passwordHash: string; // simple btoa hash — good enough for a local app
+  role: UserRole;
+  createdAt: string;
+}
+
+export interface AuthSession {
+  userId: string;
+  role: UserRole;
+  name: string;
+}

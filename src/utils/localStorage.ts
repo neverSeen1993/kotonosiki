@@ -1,7 +1,29 @@
-import { Cat, MedicalRecord } from '../types';
+import { Cat, MedicalRecord, User, AuthSession } from '../types';
 
 const CATS_KEY = 'kotonosiki_cats';
 const RECORDS_KEY = 'kotonosiki_records';
+const USERS_KEY = 'kotonosiki_users';
+const SESSION_KEY = 'kotonosiki_session';
+
+// Seed default users if none exist
+const DEFAULT_USERS: User[] = [
+  {
+    id: 'user-admin',
+    name: 'Адміністратор',
+    login: 'admin',
+    passwordHash: btoa('admin123'),
+    role: 'admin',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'user-helper',
+    name: 'Помічник',
+    login: 'helper',
+    passwordHash: btoa('helper123'),
+    role: 'helper',
+    createdAt: new Date().toISOString(),
+  },
+];
 
 export function loadCats(): Cat[] {
   try {
@@ -49,5 +71,40 @@ export function importData(json: string): boolean {
     return true;
   } catch {
     return false;
+  }
+}
+
+export function loadUsers(): User[] {
+  try {
+    const raw = localStorage.getItem(USERS_KEY);
+    const users: User[] = raw ? JSON.parse(raw) : [];
+    if (users.length === 0) {
+      saveUsers(DEFAULT_USERS);
+      return DEFAULT_USERS;
+    }
+    return users;
+  } catch {
+    return DEFAULT_USERS;
+  }
+}
+
+export function saveUsers(users: User[]): void {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+
+export function loadSession(): AuthSession | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveSession(session: AuthSession | null): void {
+  if (session) {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  } else {
+    localStorage.removeItem(SESSION_KEY);
   }
 }

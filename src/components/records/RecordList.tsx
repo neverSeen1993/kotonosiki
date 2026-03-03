@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MedicalRecord, RecordType } from '../../types';
 import { useRecordsStore } from '../../store/recordsStore';
+import { useAuth } from '../../hooks/useAuth';
 import { formatDate } from '../../utils/dateUtils';
 import RecordBadge from './RecordBadge';
 import RecordForm from './RecordForm';
@@ -27,6 +28,7 @@ const emptyMessages: Record<RecordType, { title: string; description: string }> 
 
 export default function RecordList({ catId, type }: RecordListProps) {
   const { getRecordsByCatAndType, addRecord, updateRecord, deleteRecord } = useRecordsStore();
+  const { isAdmin } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editRecord, setEditRecord] = useState<MedicalRecord | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -54,9 +56,11 @@ export default function RecordList({ catId, type }: RecordListProps) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-gray-700">{typeLabels[type]}</h3>
-        <button onClick={() => setShowForm(true)} className="btn-primary text-sm py-1.5 px-3">
-          <Plus size={15} /> Додати
-        </button>
+        {isAdmin && (
+          <button onClick={() => setShowForm(true)} className="btn-primary text-sm py-1.5 px-3">
+            <Plus size={15} /> Додати
+          </button>
+        )}
       </div>
 
       {records.length === 0 ? (
@@ -64,9 +68,11 @@ export default function RecordList({ catId, type }: RecordListProps) {
           title={empty.title}
           description={empty.description}
           action={
-            <button onClick={() => setShowForm(true)} className="btn-primary text-sm">
-              <Plus size={15} /> Додати перший запис
-            </button>
+            isAdmin ? (
+              <button onClick={() => setShowForm(true)} className="btn-primary text-sm">
+                <Plus size={15} /> Додати перший запис
+              </button>
+            ) : undefined
           }
         />
       ) : (
@@ -87,20 +93,24 @@ export default function RecordList({ catId, type }: RecordListProps) {
                     <p className="text-xs text-gray-400 mt-0.5">{formatDate(record.date)}</p>
                   </div>
                   <div className="flex items-center gap-1">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setEditRecord(record); }}
-                      className="p-1.5 rounded-lg text-gray-400 hover:text-teal-600 hover:bg-teal-50 transition"
-                      aria-label="Edit"
-                    >
-                      <Edit2 size={14} />
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleDelete(record.id); }}
-                      className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
-                      aria-label="Delete"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    {isAdmin && (
+                      <>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setEditRecord(record); }}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-teal-600 hover:bg-teal-50 transition"
+                          aria-label="Редагувати"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDelete(record.id); }}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+                          aria-label="Видалити"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </>
+                    )}
                     {isOpen ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
                   </div>
                 </div>

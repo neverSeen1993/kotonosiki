@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCatsStore } from '../store/catsStore';
+import { useAuth } from '../hooks/useAuth';
 import { Cat } from '../types';
 import CatCard from '../components/cats/CatCard';
 import CatForm from '../components/cats/CatForm';
@@ -9,6 +10,7 @@ import { Plus, Search } from 'lucide-react';
 
 export default function CatalogPage() {
   const { cats, addCat } = useCatsStore();
+  const { isAdmin } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -30,9 +32,11 @@ export default function CatalogPage() {
           <h1 className="text-2xl font-bold text-gray-800">Каталог котів</h1>
           <p className="text-sm text-gray-400 mt-0.5">{cats.length} котик{cats.length === 1 ? '' : cats.length >= 2 && cats.length <= 4 ? 'и' : 'ів'} зареєстровано</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary">
-          <Plus size={18} /> Додати кота
-        </button>
+        {isAdmin && (
+          <button onClick={() => setShowForm(true)} className="btn-primary">
+            <Plus size={18} /> Додати кота
+          </button>
+        )}
       </div>
 
       {cats.length > 0 && (
@@ -53,9 +57,11 @@ export default function CatalogPage() {
           title="Котів ще немає"
           description="Додайте першого кота, щоб розпочати відстеження його здоров'я."
           action={
-            <button onClick={() => setShowForm(true)} className="btn-primary">
-              <Plus size={18} /> Додати першого кота
-            </button>
+            isAdmin ? (
+              <button onClick={() => setShowForm(true)} className="btn-primary">
+                <Plus size={18} /> Додати першого кота
+              </button>
+            ) : undefined
           }
         />
       ) : filtered.length === 0 ? (
@@ -68,7 +74,7 @@ export default function CatalogPage() {
         </div>
       )}
 
-      {showForm && (
+      {isAdmin && showForm && (
         <Modal title="Додати нового кота" onClose={() => setShowForm(false)}>
           <CatForm onSubmit={handleAdd} onCancel={() => setShowForm(false)} />
         </Modal>

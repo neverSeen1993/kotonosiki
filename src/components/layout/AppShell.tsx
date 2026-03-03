@@ -1,12 +1,16 @@
-import { NavLink, Link } from 'react-router-dom';
-import { Cat, LayoutGrid, Calendar, Download, Upload } from 'lucide-react';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { Cat, LayoutGrid, Calendar, Download, Upload, LogOut, ShieldCheck, Eye } from 'lucide-react';
 import { useRecordsStore } from '../../store/recordsStore';
 import { exportData, importData } from '../../utils/localStorage';
 import { useCatsStore } from '../../store/catsStore';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const { getUpcomingAppointments } = useRecordsStore();
   const { cats } = useCatsStore();
+  const { session, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
+
   const upcoming = getUpcomingAppointments();
   const overdueCount = upcoming.filter((r) => {
     const d = new Date(r.date);
@@ -14,6 +18,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     today.setHours(0, 0, 0, 0);
     return d < today;
   }).length;
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
 
   const handleExport = () => {
     const json = exportData();
@@ -57,13 +66,24 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     },
   ];
 
+  const RoleBadge = () => (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+        isAdmin ? 'bg-teal-100 text-teal-700' : 'bg-amber-100 text-amber-700'
+      }`}
+    >
+      {isAdmin ? <ShieldCheck size={11} /> : <Eye size={11} />}
+      {isAdmin ? 'Адмін' : 'Помічник'}
+    </span>
+  );
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
       <aside className="hidden md:flex md:flex-col md:w-56 bg-white border-r border-gray-100 px-3 py-6 flex-shrink-0">
         <Link to="/" className="flex items-center gap-2 px-3 mb-8">
           <Cat size={28} className="text-teal-500" />
-          <span className="text-xl font-bold text-gray-800">Kotonosyky</span>
+          <span className="text-xl font-bold text-gray-800">Котоносики</span>
         </Link>
 
         <nav className="flex-1 space-y-1">
@@ -90,18 +110,36 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="border-t border-gray-100 pt-4 mt-4 space-y-1">
+          {/* User info */}
+          <div className="px-3 mb-3">
+            <p className="text-sm font-medium text-gray-700 truncate">{session?.name}</p>
+            <div className="mt-1"><RoleBadge /></div>
+          </div>
+
           <p className="text-xs text-gray-400 px-3 mb-2">{cats.length} котик{cats.length === 1 ? '' : cats.length >= 2 && cats.length <= 4 ? 'и' : 'ів'}</p>
+
+          {isAdmin && (
+            <>
+              <button
+                onClick={handleExport}
+                className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-gray-500 hover:bg-gray-50 w-full transition"
+              >
+                <Download size={16} /> Експорт копії
+              </button>
+              <button
+                onClick={handleImport}
+                className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-gray-500 hover:bg-gray-50 w-full transition"
+              >
+                <Upload size={16} /> Імпорт копії
+              </button>
+            </>
+          )}
+
           <button
-            onClick={handleExport}
-            className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-gray-500 hover:bg-gray-50 w-full transition"
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-red-500 hover:bg-red-50 w-full transition"
           >
-            <Download size={16} /> Експорт копії
-          </button>
-          <button
-            onClick={handleImport}
-            className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-gray-500 hover:bg-gray-50 w-full transition"
-          >
-            <Upload size={16} /> Імпорт копії
+            <LogOut size={16} /> Вийти
           </button>
         </div>
       </aside>
@@ -110,8 +148,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <div className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
         <Link to="/" className="flex items-center gap-2">
           <Cat size={24} className="text-teal-500" />
-          <span className="text-lg font-bold text-gray-800">Kotonosyky</span>
+          <span className="text-lg font-bold text-gray-800">Котоносики</span>
         </Link>
+        <div className="flex items-center gap-2">
+          <RoleBadge />
+          <button
+            onClick={handleLogout}
+            className="p-1.5 rounded-lg text-red-400 hover:bg-red-50 transition"
+            aria-label="Вийти"
+          >
+            <LogOut size={18} />
+          </button>
+        </div>
       </div>
 
       {/* Main */}
