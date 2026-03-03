@@ -1,7 +1,8 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Cat, LayoutGrid, Calendar, Download, Upload, LogOut, ShieldCheck, Eye } from 'lucide-react';
+import { Cat, LayoutGrid, Calendar, Download, Upload, LogOut, ShieldCheck, Eye, FileSpreadsheet } from 'lucide-react';
 import { useRecordsStore } from '../../store/recordsStore';
 import { exportData, importData } from '../../utils/localStorage';
+import { exportToExcel } from '../../utils/exportExcel';
 import { useCatsStore } from '../../store/catsStore';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -124,7 +125,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 onClick={handleExport}
                 className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-gray-500 hover:bg-gray-50 w-full transition"
               >
-                <Download size={16} /> Експорт копії
+                <Download size={16} /> Експорт копії (JSON)
+              </button>
+              <button
+                onClick={exportToExcel}
+                className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-gray-500 hover:bg-gray-50 w-full transition"
+              >
+                <FileSpreadsheet size={16} /> Експорт в Excel
               </button>
               <button
                 onClick={handleImport}
