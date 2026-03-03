@@ -44,7 +44,7 @@ export function exportToExcel(): void {
     'Нотатки': c.notes ?? '',
     'Історія': c.history ?? '',
     'Патрон': c.patron?.name ?? '',
-    'Патрон — дата патронажу': c.patron?.since ? formatDate(c.patron.since) : '',
+    'Патрон — під опікою з': c.patron?.since ? formatDate(c.patron.since) : '',
     'Патрон — звідки дізнались': c.patron?.origin ?? '',
     'Додано': formatDate(c.createdAt),
   }));

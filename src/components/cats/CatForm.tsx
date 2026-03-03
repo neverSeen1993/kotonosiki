@@ -173,7 +173,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="label">Дата патронажу</label>
+              <label className="label">Під опікою з</label>
               <input type="date" {...register('patronSince')} className="input" />
             </div>
             <div>

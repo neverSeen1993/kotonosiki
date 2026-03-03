@@ -157,7 +157,7 @@ export default function CatProfilePage() {
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500">
             <span><span className="font-medium">Ім'я:</span> {cat.patron.name}</span>
             {cat.patron.since && (
-              <span><span className="font-medium">Патронує з:</span> {formatDate(cat.patron.since)}</span>
+              <span><span className="font-medium">Під опікою з:</span> {formatDate(cat.patron.since)}</span>
             )}
             {cat.patron.origin && (
               <span><span className="font-medium">Звідки дізнались:</span> {cat.patron.origin}</span>
