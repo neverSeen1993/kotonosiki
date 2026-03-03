@@ -19,6 +19,13 @@ const sexLabel: Record<string, string> = {
   female: 'Кішка ♀',
 };
 
+const locationLabel: Record<string, string> = {
+  big_room: 'Велика кімната',
+  quarantine: 'Карантин',
+  kids_room: 'Дитяча кімната',
+  foster_home: "Прийомна сім'я",
+};
+
 export function exportToExcel(): void {
   const cats = loadCats();
   const records = loadRecords();
@@ -30,6 +37,7 @@ export function exportToExcel(): void {
     'Стать': sexLabel[c.sex] ?? c.sex,
     'Дата народження': formatDate(c.birthDate),
     'Дата прибуття': c.arrivalDate ? formatDate(c.arrivalDate) : '',
+    'Місцезнаходження': c.location ? (locationLabel[c.location] ?? c.location) : '',
     'Колір': c.color,
     'Нотатки': c.notes ?? '',
     'Додано': formatDate(c.createdAt),

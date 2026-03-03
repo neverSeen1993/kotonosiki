@@ -11,6 +11,13 @@ import Modal from '../components/ui/Modal';
 import { formatAge, formatDate } from '../utils/dateUtils';
 import { ArrowLeft, Edit2, Trash2, Stethoscope, Syringe, Calendar } from 'lucide-react';
 
+const locationLabel: Record<string, string> = {
+  big_room: 'Велика кімната',
+  quarantine: 'Карантин',
+  kids_room: 'Дитяча кімната',
+  foster_home: "Прийомна сім'я",
+};
+
 type Tab = 'procedures' | 'vaccinations' | 'appointments';
 
 export default function CatProfilePage() {
@@ -108,6 +115,11 @@ export default function CatProfilePage() {
                 <span>
                   <span className="font-medium">Колір:</span> {cat.color}
                 </span>
+                {cat.location && (
+                  <span>
+                    <span className="font-medium">Місцезнаходження:</span> {locationLabel[cat.location] ?? cat.location}
+                  </span>
+                )}
               </div>
 
               {cat.notes && (

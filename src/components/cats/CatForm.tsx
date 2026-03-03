@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Cat } from '../../types';
+import { Cat, CatLocation } from '../../types';
 
 const schema = z.object({
   name: z.string().min(1, "Ім'я обов'язкове"),
@@ -11,6 +11,7 @@ const schema = z.object({
   color: z.string().min(1, "Колір обов'язковий"),
   photoUrl: z.string().optional(),
   arrivalDate: z.string().optional(),
+  location: z.enum(['big_room', 'quarantine', 'kids_room', 'foster_home']).optional(),
   notes: z.string().optional(),
 });
 
@@ -38,6 +39,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           color: initialData.color,
           photoUrl: initialData.photoUrl ?? '',
           arrivalDate: initialData.arrivalDate ?? '',
+          location: initialData.location,
           notes: initialData.notes ?? '',
         }
       : { sex: 'female' },
@@ -52,6 +54,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       color: data.color,
       photoUrl: data.photoUrl || undefined,
       arrivalDate: data.arrivalDate || undefined,
+      location: data.location as CatLocation | undefined,
       notes: data.notes || undefined,
     });
   };
@@ -109,6 +112,17 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           className="input"
           placeholder="Дата прибуття кота (необов'язково)"
         />
+      </div>
+
+      <div>
+        <label className="label">Місцезнаходження</label>
+        <select {...register('location')} className="input">
+          <option value="">— не вказано —</option>
+          <option value="big_room">Велика кімната</option>
+          <option value="quarantine">Карантин</option>
+          <option value="kids_room">Дитяча кімната</option>
+          <option value="foster_home">Прийомна сім'я</option>
+        </select>
       </div>
 
       <div>

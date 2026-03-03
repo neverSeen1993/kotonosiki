@@ -1,3 +1,5 @@
+export type CatLocation = 'big_room' | 'quarantine' | 'kids_room' | 'foster_home';
+
 export interface Cat {
   id: string;
   name: string;
@@ -7,6 +9,7 @@ export interface Cat {
   color: string;
   photoUrl?: string;
   arrivalDate?: string;
+  location?: CatLocation;
   notes?: string;
   createdAt: string;
 }
