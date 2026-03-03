@@ -1,1 +1,3 @@
 # kotonosiki
+
+fully vibe coded
