@@ -15,7 +15,7 @@ const locationLabel: Record<string, string> = {
   big_room: 'Велика кімната',
   quarantine: 'Карантин',
   kids_room: 'Дитяча кімната',
-  foster_home: "Прийомна сім'я",
+  foster_home: 'Домашня перетримка',
 };
 
 type Tab = 'procedures' | 'vaccinations' | 'appointments';

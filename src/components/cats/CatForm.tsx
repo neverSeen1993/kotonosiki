@@ -121,7 +121,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           <option value="big_room">Велика кімната</option>
           <option value="quarantine">Карантин</option>
           <option value="kids_room">Дитяча кімната</option>
-          <option value="foster_home">Прийомна сім'я</option>
+          <option value="foster_home">Домашня перетримка</option>
         </select>
       </div>
 
