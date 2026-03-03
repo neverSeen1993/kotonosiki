@@ -40,6 +40,8 @@ export function exportToExcel(): void {
     'Днів з прибуття': c.arrivalDate ? String(daysSince(c.arrivalDate)) : '',
     'Місцезнаходження': c.location ? (locationLabel[c.location] ?? c.location) : '',
     'Звідки': c.origin ?? '',
+    'FIV': c.fiv === 'positive' ? 'Позитивний' : c.fiv === 'negative' ? 'Негативний' : '',
+    'FeLV': c.felv === 'positive' ? 'Позитивний' : c.felv === 'negative' ? 'Негативний' : '',
     'Колір': c.color,
     'Нотатки': c.notes ?? '',
     'Історія': c.history ?? '',

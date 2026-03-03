@@ -127,6 +127,16 @@ export default function CatProfilePage() {
                     <span className="font-medium">Звідки:</span> {cat.origin}
                   </span>
                 )}
+                {cat.fiv && (
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${cat.fiv === 'positive' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                    FIV {cat.fiv === 'positive' ? 'позитивний' : 'негативний'}
+                  </span>
+                )}
+                {cat.felv && (
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${cat.felv === 'positive' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                    FeLV {cat.felv === 'positive' ? 'позитивний' : 'негативний'}
+                  </span>
+                )}
               </div>
 
               {cat.history && (

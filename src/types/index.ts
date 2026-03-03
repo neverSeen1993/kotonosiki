@@ -8,6 +8,8 @@ export interface Patron {
   phone?: string;
 }
 
+export type TestResult = 'positive' | 'negative';
+
 export interface Cat {
   id: string;
   name: string;
@@ -20,6 +22,8 @@ export interface Cat {
   location?: CatLocation;
   origin?: string;
   history?: string;
+  fiv?: TestResult;
+  felv?: TestResult;
   patron?: Patron;
   notes?: string;
   createdAt: string;

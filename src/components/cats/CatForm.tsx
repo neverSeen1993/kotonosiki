@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Cat, CatLocation, Patron } from '../../types';
+import { Cat, CatLocation, Patron, TestResult } from '../../types';
 
 const schema = z.object({
   name: z.string().min(1, "Ім'я обов'язкове"),
@@ -14,6 +14,8 @@ const schema = z.object({
   location: z.enum(['big_room', 'quarantine', 'kids_room', 'foster_home']).optional(),
   origin: z.string().optional(),
   history: z.string().optional(),
+  fiv: z.enum(['positive', 'negative']).optional(),
+  felv: z.enum(['positive', 'negative']).optional(),
   patronName: z.string().optional(),
   patronSince: z.string().optional(),
   patronOrigin: z.string().optional(),
@@ -49,6 +51,8 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           location: initialData.location,
           origin: initialData.origin ?? '',
           history: initialData.history ?? '',
+          fiv: initialData.fiv,
+          felv: initialData.felv,
           patronName: initialData.patron?.name ?? '',
           patronSince: initialData.patron?.since ?? '',
           patronOrigin: initialData.patron?.origin ?? '',
@@ -71,6 +75,8 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       location: data.location as CatLocation | undefined,
       origin: data.origin || undefined,
       history: data.history || undefined,
+      fiv: data.fiv as TestResult | undefined,
+      felv: data.felv as TestResult | undefined,
       patron: data.patronName
         ? ({ name: data.patronName, since: data.patronSince ?? '', origin: data.patronOrigin ?? '', instagram: data.patronInstagram || undefined, phone: data.patronPhone || undefined } as Patron)
         : undefined,
@@ -151,6 +157,25 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           className="input"
           placeholder="Притулок, вулиця, інший розплідник..."
         />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="label">FIV</label>
+          <select {...register('fiv')} className="input">
+            <option value="">— не тестувався —</option>
+            <option value="negative">Негативний</option>
+            <option value="positive">Позитивний</option>
+          </select>
+        </div>
+        <div>
+          <label className="label">FeLV</label>
+          <select {...register('felv')} className="input">
+            <option value="">— не тестувався —</option>
+            <option value="negative">Негативний</option>
+            <option value="positive">Позитивний</option>
+          </select>
+        </div>
       </div>
 
       <div>
