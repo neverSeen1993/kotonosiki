@@ -141,7 +141,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       </div>
 
       <div>
-        <label className="label">Історія кота</label>
+        <label className="label">Історія</label>
         <textarea
           {...register('history')}
           className="input resize-none"

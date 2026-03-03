@@ -131,7 +131,7 @@ export default function CatProfilePage() {
 
               {cat.history && (
                 <div className="mt-3 bg-gray-50 rounded-lg px-3 py-2">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Історія кота</p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Історія</p>
                   <p className="text-sm text-gray-600 whitespace-pre-wrap">{cat.history}</p>
                 </div>
               )}
