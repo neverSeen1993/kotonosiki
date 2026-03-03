@@ -42,7 +42,7 @@ export default function CatalogPage() {
   };
 
   const filtered = cats.filter((c) => {
-    if (search && !c.name.toLowerCase().includes(search.toLowerCase()) && !c.breed.toLowerCase().includes(search.toLowerCase())) return false;
+    if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
     if (patronFilter === 'with' && !c.patron?.name) return false;
     if (patronFilter === 'without' && c.patron?.name) return false;
     if (fivFilter === 'positive' && c.fiv !== 'positive') return false;
@@ -81,7 +81,7 @@ export default function CatalogPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Пошук за іменем або породою..."
+                placeholder="Пошук за іменем..."
                 className="input pl-9"
               />
             </div>
