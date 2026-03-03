@@ -206,6 +206,16 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
         />
       </div>
 
+      <div>
+        <label className="label">Особливості прилаштування</label>
+        <textarea
+          {...register('adoptionNotes')}
+          className="input resize-none"
+          rows={3}
+          placeholder="Умови передачі, побажання, особливості..."
+        />
+      </div>
+
       {/* Patron section */}
       <div className="border-t border-gray-100 pt-4">
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Патрон</p>
@@ -284,15 +294,6 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           <div>
             <label className="label">Instagram</label>
             <input {...register('adoptionInstagram')} className="input" placeholder="@username" />
-          </div>
-          <div>
-            <label className="label">Особливості прилаштування</label>
-            <textarea
-              {...register('adoptionNotes')}
-              className="input resize-none"
-              rows={3}
-              placeholder="Умови передачі, побажання, особливості..."
-            />
           </div>
         </div>
       </div>

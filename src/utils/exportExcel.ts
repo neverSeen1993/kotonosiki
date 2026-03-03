@@ -45,6 +45,7 @@ export function exportToExcel(): void {
     'Колір': c.color,
     'Нотатки': c.notes ?? '',
     'Історія': c.history ?? '',
+    'Особливості прилаштування': c.adoptionNotes ?? '',
     'Патрон': c.patron?.name ?? '',
     'Патрон — під опікою з': c.patron?.since ? formatDate(c.patron.since) : '',
     'Патрон — звідки дізнались': c.patron?.origin ?? '',
@@ -56,7 +57,6 @@ export function exportToExcel(): void {
     'Адопція — телефон 1': c.adoption?.phone1 ?? '',
     'Адопція — телефон 2': c.adoption?.phone2 ?? '',
     'Адопція — Instagram': c.adoption?.instagram ?? '',
-    'Особливості прилаштування': c.adoptionNotes ?? '',
     'Додано': formatDate(c.createdAt),
   }));
 
