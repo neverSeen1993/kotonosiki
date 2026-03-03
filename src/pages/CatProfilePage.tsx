@@ -110,7 +110,7 @@ export default function CatProfilePage() {
                   </span>
                 )}
                 <span>
-                  <span className="font-medium">Стать:</span> {cat.sex === 'male' ? '♂ Кіт' : '♀ Кішка'}
+                  <span className="font-medium">Стать:</span> {cat.sex === 'male' ? '♂ Кіт' : '♀ Киця'}
                 </span>
                 <span>
                   <span className="font-medium">Колір:</span> {cat.color}

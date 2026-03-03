@@ -70,7 +70,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
         <div>
           <label className="label">Стать *</label>
           <select {...register('sex')} className="input">
-            <option value="female">Кішка ♀</option>
+            <option value="female">Киця ♀</option>
             <option value="male">Кіт ♂</option>
           </select>
         </div>

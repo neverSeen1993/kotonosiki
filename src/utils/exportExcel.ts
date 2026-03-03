@@ -16,7 +16,7 @@ const statusLabel: Record<string, string> = {
 
 const sexLabel: Record<string, string> = {
   male: 'Кіт ♂',
-  female: 'Кішка ♀',
+  female: 'Киця ♀',
 };
 
 const locationLabel: Record<string, string> = {
