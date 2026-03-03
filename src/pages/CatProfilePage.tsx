@@ -226,6 +226,12 @@ export default function CatProfilePage() {
               </span>
             )}
           </div>
+          {cat.adoptionNotes && (
+            <div className="mt-3 bg-gray-50 rounded-lg px-3 py-2">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Особливості прилаштування</p>
+              <p className="text-sm text-gray-600 whitespace-pre-wrap">{cat.adoptionNotes}</p>
+            </div>
+          )}
         </div>
       ) : null}
 

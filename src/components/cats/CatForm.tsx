@@ -27,6 +27,7 @@ const schema = z.object({
   adoptionPhone1: z.string().optional(),
   adoptionPhone2: z.string().optional(),
   adoptionInstagram: z.string().optional(),
+  adoptionNotes: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -70,6 +71,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           adoptionPhone1: initialData.adoption?.phone1 ?? '',
           adoptionPhone2: initialData.adoption?.phone2 ?? '',
           adoptionInstagram: initialData.adoption?.instagram ?? '',
+          adoptionNotes: initialData.adoptionNotes ?? '',
           notes: initialData.notes ?? '',
         }
       : { sex: 'female' },
@@ -95,6 +97,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       adoption: data.adoptionDate || data.adoptionFrom
         ? ({ date: data.adoptionDate ?? '', from: data.adoptionFrom ?? '', email: data.adoptionEmail || undefined, phone1: data.adoptionPhone1 || undefined, phone2: data.adoptionPhone2 || undefined, instagram: data.adoptionInstagram || undefined } as Adoption)
         : undefined,
+      adoptionNotes: data.adoptionNotes || undefined,
       notes: data.notes || undefined,
     });
   };
@@ -281,6 +284,15 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           <div>
             <label className="label">Instagram</label>
             <input {...register('adoptionInstagram')} className="input" placeholder="@username" />
+          </div>
+          <div>
+            <label className="label">Особливості прилаштування</label>
+            <textarea
+              {...register('adoptionNotes')}
+              className="input resize-none"
+              rows={3}
+              placeholder="Умови передачі, побажання, особливості..."
+            />
           </div>
         </div>
       </div>

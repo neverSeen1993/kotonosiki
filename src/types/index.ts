@@ -35,6 +35,7 @@ export interface Cat {
   felv?: TestResult;
   patron?: Patron;
   adoption?: Adoption;
+  adoptionNotes?: string;
   notes?: string;
   createdAt: string;
 }

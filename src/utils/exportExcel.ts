@@ -56,6 +56,7 @@ export function exportToExcel(): void {
     'Адопція — телефон 1': c.adoption?.phone1 ?? '',
     'Адопція — телефон 2': c.adoption?.phone2 ?? '',
     'Адопція — Instagram': c.adoption?.instagram ?? '',
+    'Особливості прилаштування': c.adoptionNotes ?? '',
     'Додано': formatDate(c.createdAt),
   }));
 
