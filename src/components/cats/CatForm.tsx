@@ -12,6 +12,7 @@ const schema = z.object({
   photoUrl: z.string().optional(),
   arrivalDate: z.string().optional(),
   location: z.enum(['big_room', 'quarantine', 'kids_room', 'foster_home']).optional(),
+  origin: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -40,6 +41,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           photoUrl: initialData.photoUrl ?? '',
           arrivalDate: initialData.arrivalDate ?? '',
           location: initialData.location,
+          origin: initialData.origin ?? '',
           notes: initialData.notes ?? '',
         }
       : { sex: 'female' },
@@ -55,6 +57,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       photoUrl: data.photoUrl || undefined,
       arrivalDate: data.arrivalDate || undefined,
       location: data.location as CatLocation | undefined,
+      origin: data.origin || undefined,
       notes: data.notes || undefined,
     });
   };
@@ -123,6 +126,15 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           <option value="kids_room">Дитяча кімната</option>
           <option value="foster_home">Домашня перетримка</option>
         </select>
+      </div>
+
+      <div>
+        <label className="label">Звідки</label>
+        <input
+          {...register('origin')}
+          className="input"
+          placeholder="Притулок, вулиця, інший розплідник..."
+        />
       </div>
 
       <div>

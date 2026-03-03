@@ -122,6 +122,11 @@ export default function CatProfilePage() {
                     <span className="font-medium">Місцезнаходження:</span> {locationLabel[cat.location] ?? cat.location}
                   </span>
                 )}
+                {cat.origin && (
+                  <span>
+                    <span className="font-medium">Звідки:</span> {cat.origin}
+                  </span>
+                )}
               </div>
 
               {cat.notes && (

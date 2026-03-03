@@ -39,6 +39,7 @@ export function exportToExcel(): void {
     'Дата прибуття': c.arrivalDate ? formatDate(c.arrivalDate) : '',
     'Днів з прибуття': c.arrivalDate ? String(daysSince(c.arrivalDate)) : '',
     'Місцезнаходження': c.location ? (locationLabel[c.location] ?? c.location) : '',
+    'Звідки': c.origin ?? '',
     'Колір': c.color,
     'Нотатки': c.notes ?? '',
     'Додано': formatDate(c.createdAt),

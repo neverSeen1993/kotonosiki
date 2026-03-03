@@ -10,6 +10,7 @@ export interface Cat {
   photoUrl?: string;
   arrivalDate?: string;
   location?: CatLocation;
+  origin?: string;
   notes?: string;
   createdAt: string;
 }
