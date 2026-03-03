@@ -16,6 +16,7 @@ const schema = z.object({
   history: z.string().optional(),
   fiv: z.enum(['positive', 'negative']).optional(),
   felv: z.enum(['positive', 'negative']).optional(),
+  sterilised: z.enum(['yes', 'no']).optional(),
   patronName: z.string().optional(),
   patronSince: z.string().optional(),
   patronOrigin: z.string().optional(),
@@ -60,6 +61,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           history: initialData.history ?? '',
           fiv: initialData.fiv,
           felv: initialData.felv,
+          sterilised: initialData.sterilised === true ? 'yes' : initialData.sterilised === false ? 'no' : undefined,
           patronName: initialData.patron?.name ?? '',
           patronSince: initialData.patron?.since ?? '',
           patronOrigin: initialData.patron?.origin ?? '',
@@ -91,6 +93,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       history: data.history || undefined,
       fiv: data.fiv as TestResult | undefined,
       felv: data.felv as TestResult | undefined,
+      sterilised: data.sterilised === 'yes' ? true : data.sterilised === 'no' ? false : undefined,
       patron: data.patronName
         ? ({ name: data.patronName, since: data.patronSince ?? '', origin: data.patronOrigin ?? '', instagram: data.patronInstagram || undefined, phone: data.patronPhone || undefined } as Patron)
         : undefined,
@@ -194,6 +197,15 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
             <option value="positive">Позитивний</option>
           </select>
         </div>
+      </div>
+
+      <div>
+        <label className="label">Стерилізація</label>
+        <select {...register('sterilised')} className="input">
+          <option value="">— не вказано —</option>
+          <option value="yes">Так</option>
+          <option value="no">Ні</option>
+        </select>
       </div>
 
       <div>

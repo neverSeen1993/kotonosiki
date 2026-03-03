@@ -42,6 +42,7 @@ export function exportToExcel(): void {
     'Звідки': c.origin ?? '',
     'FIV': c.fiv === 'positive' ? 'Позитивний' : c.fiv === 'negative' ? 'Негативний' : '',
     'FeLV': c.felv === 'positive' ? 'Позитивний' : c.felv === 'negative' ? 'Негативний' : '',
+    'Стерилізація': c.sterilised === true ? 'Так' : c.sterilised === false ? 'Ні' : '',
     'Колір': c.color,
     'Нотатки': c.notes ?? '',
     'Історія': c.history ?? '',

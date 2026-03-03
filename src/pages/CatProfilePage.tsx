@@ -137,6 +137,11 @@ export default function CatProfilePage() {
                     FeLV {cat.felv === 'positive' ? 'позитивний' : 'негативний'}
                   </span>
                 )}
+                {cat.sterilised !== undefined && (
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cat.sterilised ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-500'}`}>
+                    Стерилізація: {cat.sterilised ? 'Так' : 'Ні'}
+                  </span>
+                )}
               </div>
 
               {cat.history && (

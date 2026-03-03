@@ -33,6 +33,7 @@ export interface Cat {
   history?: string;
   fiv?: TestResult;
   felv?: TestResult;
+  sterilised?: boolean;
   patron?: Patron;
   adoption?: Adoption;
   adoptionNotes?: string;
