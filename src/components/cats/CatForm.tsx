@@ -17,6 +17,8 @@ const schema = z.object({
   patronName: z.string().optional(),
   patronSince: z.string().optional(),
   patronOrigin: z.string().optional(),
+  patronInstagram: z.string().optional(),
+  patronPhone: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -50,6 +52,8 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           patronName: initialData.patron?.name ?? '',
           patronSince: initialData.patron?.since ?? '',
           patronOrigin: initialData.patron?.origin ?? '',
+          patronInstagram: initialData.patron?.instagram ?? '',
+          patronPhone: initialData.patron?.phone ?? '',
           notes: initialData.notes ?? '',
         }
       : { sex: 'female' },
@@ -68,7 +72,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       origin: data.origin || undefined,
       history: data.history || undefined,
       patron: data.patronName
-        ? ({ name: data.patronName, since: data.patronSince ?? '', origin: data.patronOrigin ?? '' } as Patron)
+        ? ({ name: data.patronName, since: data.patronSince ?? '', origin: data.patronOrigin ?? '', instagram: data.patronInstagram || undefined, phone: data.patronPhone || undefined } as Patron)
         : undefined,
       notes: data.notes || undefined,
     });
@@ -182,6 +186,24 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
                 {...register('patronOrigin')}
                 className="input"
                 placeholder="Соцмережі, знайомі..."
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label">Instagram</label>
+              <input
+                {...register('patronInstagram')}
+                className="input"
+                placeholder="@username"
+              />
+            </div>
+            <div>
+              <label className="label">Телефон</label>
+              <input
+                {...register('patronPhone')}
+                className="input"
+                placeholder="+380..."
               />
             </div>
           </div>

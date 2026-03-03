@@ -162,6 +162,16 @@ export default function CatProfilePage() {
             {cat.patron.origin && (
               <span><span className="font-medium">Звідки дізнались:</span> {cat.patron.origin}</span>
             )}
+            {cat.patron.instagram && (
+              <span><span className="font-medium">Instagram:</span>{' '}
+                <a href={`https://instagram.com/${cat.patron.instagram.replace('@','')}`} target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">{cat.patron.instagram}</a>
+              </span>
+            )}
+            {cat.patron.phone && (
+              <span><span className="font-medium">Телефон:</span>{' '}
+                <a href={`tel:${cat.patron.phone}`} className="text-teal-600 hover:underline">{cat.patron.phone}</a>
+              </span>
+            )}
           </div>
         </div>
       ) : isAdmin && (

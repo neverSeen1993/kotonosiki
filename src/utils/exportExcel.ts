@@ -46,6 +46,8 @@ export function exportToExcel(): void {
     'Патрон': c.patron?.name ?? '',
     'Патрон — під опікою з': c.patron?.since ? formatDate(c.patron.since) : '',
     'Патрон — звідки дізнались': c.patron?.origin ?? '',
+    'Патрон — Instagram': c.patron?.instagram ?? '',
+    'Патрон — телефон': c.patron?.phone ?? '',
     'Додано': formatDate(c.createdAt),
   }));
 
