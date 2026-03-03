@@ -1,8 +1,9 @@
 import { format, parseISO, differenceInYears, differenceInMonths, isPast, isToday, isFuture, addDays } from 'date-fns';
+import { uk } from 'date-fns/locale';
 
 export function formatDate(isoDate: string): string {
   try {
-    return format(parseISO(isoDate), 'MMM d, yyyy');
+    return format(parseISO(isoDate), 'd MMM yyyy', { locale: uk });
   } catch {
     return isoDate;
   }
