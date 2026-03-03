@@ -37,7 +37,7 @@ export function exportToExcel(): void {
     'Стать': sexLabel[c.sex] ?? c.sex,
     'Дата народження': formatDate(c.birthDate),
     'Дата прибуття': c.arrivalDate ? formatDate(c.arrivalDate) : '',
-    'Днів з прибуття': c.arrivalDate ? daysSince(c.arrivalDate) : '',
+    'Днів з прибуття': c.arrivalDate ? String(daysSince(c.arrivalDate)) : '',
     'Місцезнаходження': c.location ? (locationLabel[c.location] ?? c.location) : '',
     'Колір': c.color,
     'Нотатки': c.notes ?? '',
