@@ -10,6 +10,7 @@ const schema = z.object({
   sex: z.enum(['male', 'female']),
   color: z.string().min(1, "Колір обов'язковий"),
   photoUrl: z.string().optional(),
+  arrivalDate: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -36,6 +37,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           sex: initialData.sex,
           color: initialData.color,
           photoUrl: initialData.photoUrl ?? '',
+          arrivalDate: initialData.arrivalDate ?? '',
           notes: initialData.notes ?? '',
         }
       : { sex: 'female' },
@@ -49,6 +51,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       sex: data.sex,
       color: data.color,
       photoUrl: data.photoUrl || undefined,
+      arrivalDate: data.arrivalDate || undefined,
       notes: data.notes || undefined,
     });
   };
@@ -95,6 +98,16 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           {...register('photoUrl')}
           className="input"
           placeholder="https://... (необов'язково)"
+        />
+      </div>
+
+      <div>
+        <label className="label">Дата прибуття</label>
+        <input
+          type="date"
+          {...register('arrivalDate')}
+          className="input"
+          placeholder="Дата прибуття кота (необов'язково)"
         />
       </div>
 

@@ -2,10 +2,11 @@ export interface Cat {
   id: string;
   name: string;
   breed: string;
-  birthDate: string; // ISO date string
+  birthDate: string;
   sex: 'male' | 'female';
   color: string;
   photoUrl?: string;
+  arrivalDate?: string;
   notes?: string;
   createdAt: string;
 }

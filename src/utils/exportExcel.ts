@@ -29,6 +29,7 @@ export function exportToExcel(): void {
     'Порода': c.breed,
     'Стать': sexLabel[c.sex] ?? c.sex,
     'Дата народження': formatDate(c.birthDate),
+    'Дата прибуття': c.arrivalDate ? formatDate(c.arrivalDate) : '',
     'Колір': c.color,
     'Нотатки': c.notes ?? '',
     'Додано': formatDate(c.createdAt),

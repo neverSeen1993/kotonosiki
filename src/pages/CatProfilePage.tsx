@@ -95,8 +95,13 @@ export default function CatProfilePage() {
                   <span className="font-medium">Вік:</span> {formatAge(cat.birthDate)}
                 </span>
                 <span>
-                  <span className="font-medium">Народився:</span> {formatDate(cat.birthDate)}
+                  <span className="font-medium">Дата народження:</span> {formatDate(cat.birthDate)}
                 </span>
+                {cat.arrivalDate && (
+                  <span>
+                    <span className="font-medium">Дата прибуття:</span> {formatDate(cat.arrivalDate)}
+                  </span>
+                )}
                 <span>
                   <span className="font-medium">Стать:</span> {cat.sex === 'male' ? '♂ Кіт' : '♀ Кішка'}
                 </span>
