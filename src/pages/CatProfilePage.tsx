@@ -54,7 +54,7 @@ export default function CatProfilePage() {
   };
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
-    { key: 'procedures', label: 'Процедури', icon: <Stethoscope size={15} /> },
+    { key: 'procedures', label: 'Лікування', icon: <Stethoscope size={15} /> },
     { key: 'vaccinations', label: 'Вакцинації', icon: <Syringe size={15} /> },
     { key: 'appointments', label: 'Записи', icon: <Calendar size={15} /> },
   ];

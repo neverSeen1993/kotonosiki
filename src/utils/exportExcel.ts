@@ -3,7 +3,7 @@ import { loadCats, loadRecords } from './localStorage';
 import { formatDate, daysSince } from './dateUtils';
 
 const typeLabel: Record<string, string> = {
-  procedure: 'Процедура',
+  procedure: 'Лікування',
   vaccination: 'Вакцинація',
   appointment: 'Прийом',
 };

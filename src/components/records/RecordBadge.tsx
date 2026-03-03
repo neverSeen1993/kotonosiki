@@ -6,7 +6,7 @@ interface RecordBadgeProps {
 }
 
 const typeConfig: Record<RecordType, { label: string; className: string }> = {
-  procedure: { label: 'Процедура', className: 'bg-blue-100 text-blue-700' },
+  procedure: { label: 'Лікування', className: 'bg-blue-100 text-blue-700' },
   vaccination: { label: 'Вакцинація', className: 'bg-green-100 text-green-700' },
   appointment: { label: 'Прийом', className: 'bg-purple-100 text-purple-700' },
 };

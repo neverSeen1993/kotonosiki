@@ -15,13 +15,13 @@ interface RecordListProps {
 }
 
 const typeLabels: Record<RecordType, string> = {
-  procedure: 'Процедури',
+  procedure: 'Лікування',
   vaccination: 'Вакцинації',
   appointment: 'Прийоми',
 };
 
 const emptyMessages: Record<RecordType, { title: string; description: string }> = {
-  procedure: { title: 'Процедур ще немає', description: 'Додайте медичні процедури: операції, лікування або огляди.' },
+  procedure: { title: 'Лікування ще немає', description: 'Додайте записи про лікування: операції, процедури або огляди.' },
   vaccination: { title: 'Вакцинацій ще немає', description: 'Відстежуйте щеплення та нагадування про бустери.' },
   appointment: { title: 'Прийомів ще немає', description: 'Заплануйте майбутні візити до ветеринара.' },
 };

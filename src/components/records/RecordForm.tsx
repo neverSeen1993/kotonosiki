@@ -72,7 +72,7 @@ export default function RecordForm({ catId, defaultType = 'procedure', initialDa
       <div>
         <label className="label">Тип</label>
         <select {...register('type')} className="input">
-          <option value="procedure">Процедура</option>
+          <option value="procedure">Лікування</option>
           <option value="vaccination">Вакцинація</option>
           <option value="appointment">Прийом</option>
         </select>
