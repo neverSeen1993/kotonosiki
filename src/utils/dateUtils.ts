@@ -11,10 +11,18 @@ export function formatDate(isoDate: string): string {
 export function formatAge(birthDate: string): string {
   const birth = parseISO(birthDate);
   const years = differenceInYears(new Date(), birth);
-  if (years >= 1) return `${years} year${years !== 1 ? 's' : ''}`;
+  if (years >= 1) {
+    if (years === 1) return `1 рік`;
+    if (years >= 2 && years <= 4) return `${years} роки`;
+    return `${years} років`;
+  }
   const months = differenceInMonths(new Date(), birth);
-  if (months >= 1) return `${months} month${months !== 1 ? 's' : ''}`;
-  return 'Newborn';
+  if (months >= 1) {
+    if (months === 1) return `1 місяць`;
+    if (months >= 2 && months <= 4) return `${months} місяці`;
+    return `${months} місяців`;
+  }
+  return 'Новонароджений';
 }
 
 export function isOverdue(date: string): boolean {

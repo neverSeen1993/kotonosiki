@@ -4,11 +4,11 @@ import { z } from 'zod';
 import { Cat } from '../../types';
 
 const schema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  breed: z.string().min(1, 'Breed is required'),
-  birthDate: z.string().min(1, 'Birth date is required'),
+  name: z.string().min(1, "Ім'я обов'язкове"),
+  breed: z.string().min(1, "Порода обов'язкова"),
+  birthDate: z.string().min(1, "Дата народження обов'язкова"),
   sex: z.enum(['male', 'female']),
-  color: z.string().min(1, 'Color is required'),
+  color: z.string().min(1, "Колір обов'язковий"),
   photoUrl: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -57,63 +57,63 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="label">Name *</label>
-          <input {...register('name')} className="input" placeholder="Luna" />
+          <label className="label">Ім'я *</label>
+          <input {...register('name')} className="input" placeholder="Луна" />
           {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
         </div>
         <div>
-          <label className="label">Sex *</label>
+          <label className="label">Стать *</label>
           <select {...register('sex')} className="input">
-            <option value="female">Female ♀</option>
-            <option value="male">Male ♂</option>
+            <option value="female">Кішка ♀</option>
+            <option value="male">Кіт ♂</option>
           </select>
         </div>
       </div>
 
       <div>
-        <label className="label">Breed *</label>
-        <input {...register('breed')} className="input" placeholder="Maine Coon, British Shorthair..." />
+        <label className="label">Порода *</label>
+        <input {...register('breed')} className="input" placeholder="Мейн-кун, Британська короткошерста..." />
         {errors.breed && <p className="text-xs text-red-500 mt-1">{errors.breed.message}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="label">Birth date *</label>
+          <label className="label">Дата народження *</label>
           <input type="date" {...register('birthDate')} className="input" />
           {errors.birthDate && <p className="text-xs text-red-500 mt-1">{errors.birthDate.message}</p>}
         </div>
         <div>
-          <label className="label">Color *</label>
-          <input {...register('color')} className="input" placeholder="Tabby, Black & White..." />
+          <label className="label">Колір *</label>
+          <input {...register('color')} className="input" placeholder="Таббі, чорно-білий..." />
           {errors.color && <p className="text-xs text-red-500 mt-1">{errors.color.message}</p>}
         </div>
       </div>
 
       <div>
-        <label className="label">Photo URL</label>
+        <label className="label">Фото (URL)</label>
         <input
           {...register('photoUrl')}
           className="input"
-          placeholder="https://... (optional)"
+          placeholder="https://... (необов'язково)"
         />
       </div>
 
       <div>
-        <label className="label">Notes</label>
+        <label className="label">Нотатки</label>
         <textarea
           {...register('notes')}
           className="input resize-none"
           rows={3}
-          placeholder="Special notes about this cat..."
+          placeholder="Особливі нотатки про цього кота..."
         />
       </div>
 
       <div className="flex justify-end gap-3 pt-2">
         <button type="button" onClick={onCancel} className="btn-secondary">
-          Cancel
+          Скасувати
         </button>
         <button type="submit" className="btn-primary">
-          {initialData ? 'Save changes' : 'Add cat'}
+          {initialData ? 'Зберегти зміни' : 'Додати кота'}
         </button>
       </div>
     </form>

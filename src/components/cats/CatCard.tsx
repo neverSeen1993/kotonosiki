@@ -43,7 +43,7 @@ export default function CatCard({ cat }: CatCardProps) {
           </div>
           <div className="flex items-center gap-1.5 text-xs text-gray-500">
             <Calendar size={13} className="text-purple-400" />
-            <span>{appointments} upcoming</span>
+            <span>{appointments} майбутніх</span>
           </div>
         </div>
       </div>

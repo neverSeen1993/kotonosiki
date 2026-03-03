@@ -5,8 +5,8 @@ import { MedicalRecord, RecordType } from '../../types';
 import { today } from '../../utils/dateUtils';
 
 const schema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  date: z.string().min(1, 'Date is required'),
+  title: z.string().min(1, "Назва обов'язкова"),
+  date: z.string().min(1, "Дата обов'язкова"),
   type: z.enum(['procedure', 'vaccination', 'appointment']),
   status: z.enum(['done', 'scheduled', 'cancelled']),
   vet: z.string().optional(),
@@ -70,25 +70,25 @@ export default function RecordForm({ catId, defaultType = 'procedure', initialDa
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       <div>
-        <label className="label">Type</label>
+        <label className="label">Тип</label>
         <select {...register('type')} className="input">
-          <option value="procedure">Procedure</option>
-          <option value="vaccination">Vaccination</option>
-          <option value="appointment">Appointment</option>
+          <option value="procedure">Процедура</option>
+          <option value="vaccination">Вакцинація</option>
+          <option value="appointment">Прийом</option>
         </select>
       </div>
 
       <div>
-        <label className="label">Title *</label>
+        <label className="label">Назва *</label>
         <input
           {...register('title')}
           className="input"
           placeholder={
             recordType === 'vaccination'
-              ? 'e.g. Rabies vaccine'
+              ? 'напр. Вакцина від сказу'
               : recordType === 'appointment'
-              ? 'e.g. Annual check-up'
-              : 'e.g. Dental cleaning'
+              ? 'напр. Щорічний огляд'
+              : 'напр. Чищення зубів'
           }
         />
         {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title.message}</p>}
@@ -96,54 +96,54 @@ export default function RecordForm({ catId, defaultType = 'procedure', initialDa
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="label">Date *</label>
+          <label className="label">Дата *</label>
           <input type="date" {...register('date')} className="input" />
           {errors.date && <p className="text-xs text-red-500 mt-1">{errors.date.message}</p>}
         </div>
         <div>
-          <label className="label">Status</label>
+          <label className="label">Статус</label>
           <select {...register('status')} className="input">
-            <option value="done">Done</option>
-            <option value="scheduled">Scheduled</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="done">Виконано</option>
+            <option value="scheduled">Заплановано</option>
+            <option value="cancelled">Скасовано</option>
           </select>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="label">Vet / Doctor</label>
-          <input {...register('vet')} className="input" placeholder="Dr. Smith" />
+          <label className="label">Ветеринар / Лікар</label>
+          <input {...register('vet')} className="input" placeholder="Д-р Іваненко" />
         </div>
         <div>
-          <label className="label">Clinic</label>
-          <input {...register('clinic')} className="input" placeholder="Happy Paws Clinic" />
+          <label className="label">Клініка</label>
+          <input {...register('clinic')} className="input" placeholder="Клініка Щасливі лапи" />
         </div>
       </div>
 
       {(recordType === 'vaccination' || recordType === 'appointment') && (
         <div>
-          <label className="label">Next due date</label>
+          <label className="label">Наступна дата</label>
           <input type="date" {...register('nextDueDate')} className="input" />
         </div>
       )}
 
       <div>
-        <label className="label">Notes</label>
+        <label className="label">Нотатки</label>
         <textarea
           {...register('notes')}
           className="input resize-none"
           rows={3}
-          placeholder="Additional notes..."
+          placeholder="Додаткові нотатки..."
         />
       </div>
 
       <div className="flex justify-end gap-3 pt-2">
         <button type="button" onClick={onCancel} className="btn-secondary">
-          Cancel
+          Скасувати
         </button>
         <button type="submit" className="btn-primary">
-          {initialData ? 'Save changes' : 'Add record'}
+          {initialData ? 'Зберегти зміни' : 'Додати запис'}
         </button>
       </div>
     </form>

@@ -27,11 +27,11 @@ export default function CatalogPage() {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Cat Catalog</h1>
-          <p className="text-sm text-gray-400 mt-0.5">{cats.length} cat{cats.length !== 1 ? 's' : ''} registered</p>
+          <h1 className="text-2xl font-bold text-gray-800">Каталог котів</h1>
+          <p className="text-sm text-gray-400 mt-0.5">{cats.length} котик{cats.length === 1 ? '' : cats.length >= 2 && cats.length <= 4 ? 'и' : 'ів'} зареєстровано</p>
         </div>
         <button onClick={() => setShowForm(true)} className="btn-primary">
-          <Plus size={18} /> Add cat
+          <Plus size={18} /> Додати кота
         </button>
       </div>
 
@@ -42,7 +42,7 @@ export default function CatalogPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or breed..."
+            placeholder="Пошук за іменем або породою..."
             className="input pl-9"
           />
         </div>
@@ -50,16 +50,16 @@ export default function CatalogPage() {
 
       {cats.length === 0 ? (
         <EmptyState
-          title="No cats yet"
-          description="Add your first cat to start tracking their health records."
+          title="Котів ще немає"
+          description="Додайте першого кота, щоб розпочати відстеження його здоров'я."
           action={
             <button onClick={() => setShowForm(true)} className="btn-primary">
-              <Plus size={18} /> Add your first cat
+              <Plus size={18} /> Додати першого кота
             </button>
           }
         />
       ) : filtered.length === 0 ? (
-        <EmptyState title="No cats match your search" description="Try a different name or breed." />
+        <EmptyState title="Котів не знайдено" description="Спробуйте інше ім'я або породу." />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((cat) => (
@@ -69,7 +69,7 @@ export default function CatalogPage() {
       )}
 
       {showForm && (
-        <Modal title="Add a new cat" onClose={() => setShowForm(false)}>
+        <Modal title="Додати нового кота" onClose={() => setShowForm(false)}>
           <CatForm onSubmit={handleAdd} onCancel={() => setShowForm(false)} />
         </Modal>
       )}

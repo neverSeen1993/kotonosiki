@@ -39,7 +39,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         if (importData(text)) {
           window.location.reload();
         } else {
-          alert('Invalid backup file');
+          alert('Невірний файл резервної копії');
         }
       };
       reader.readAsText(file);
@@ -48,10 +48,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   };
 
   const navItems = [
-    { to: '/', label: 'Catalog', icon: <LayoutGrid size={18} />, exact: true },
+    { to: '/', label: 'Каталог', icon: <LayoutGrid size={18} />, exact: true },
     {
       to: '/appointments',
-      label: 'Appointments',
+      label: 'Прийоми',
       icon: <Calendar size={18} />,
       badge: overdueCount > 0 ? overdueCount : null,
     },
@@ -90,18 +90,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="border-t border-gray-100 pt-4 mt-4 space-y-1">
-          <p className="text-xs text-gray-400 px-3 mb-2">{cats.length} cat{cats.length !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-gray-400 px-3 mb-2">{cats.length} котик{cats.length === 1 ? '' : cats.length >= 2 && cats.length <= 4 ? 'и' : 'ів'}</p>
           <button
             onClick={handleExport}
             className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-gray-500 hover:bg-gray-50 w-full transition"
           >
-            <Download size={16} /> Export backup
+            <Download size={16} /> Експорт копії
           </button>
           <button
             onClick={handleImport}
             className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-gray-500 hover:bg-gray-50 w-full transition"
           >
-            <Upload size={16} /> Import backup
+            <Upload size={16} /> Імпорт копії
           </button>
         </div>
       </aside>

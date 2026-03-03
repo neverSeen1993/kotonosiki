@@ -14,15 +14,15 @@ interface RecordListProps {
 }
 
 const typeLabels: Record<RecordType, string> = {
-  procedure: 'Procedures',
-  vaccination: 'Vaccinations',
-  appointment: 'Appointments',
+  procedure: 'Процедури',
+  vaccination: 'Вакцинації',
+  appointment: 'Прийоми',
 };
 
 const emptyMessages: Record<RecordType, { title: string; description: string }> = {
-  procedure: { title: 'No procedures yet', description: 'Add medical procedures like surgeries, treatments, or check-ups.' },
-  vaccination: { title: 'No vaccinations yet', description: 'Track vaccines and upcoming boosters.' },
-  appointment: { title: 'No appointments yet', description: 'Schedule upcoming vet visits and appointments.' },
+  procedure: { title: 'Процедур ще немає', description: 'Додайте медичні процедури: операції, лікування або огляди.' },
+  vaccination: { title: 'Вакцинацій ще немає', description: 'Відстежуйте щеплення та нагадування про бустери.' },
+  appointment: { title: 'Прийомів ще немає', description: 'Заплануйте майбутні візити до ветеринара.' },
 };
 
 export default function RecordList({ catId, type }: RecordListProps) {
@@ -47,7 +47,7 @@ export default function RecordList({ catId, type }: RecordListProps) {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Delete this record?')) deleteRecord(id);
+    if (confirm('Видалити цей запис?')) deleteRecord(id);
   };
 
   return (
@@ -55,7 +55,7 @@ export default function RecordList({ catId, type }: RecordListProps) {
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-gray-700">{typeLabels[type]}</h3>
         <button onClick={() => setShowForm(true)} className="btn-primary text-sm py-1.5 px-3">
-          <Plus size={15} /> Add
+          <Plus size={15} /> Додати
         </button>
       </div>
 
@@ -65,7 +65,7 @@ export default function RecordList({ catId, type }: RecordListProps) {
           description={empty.description}
           action={
             <button onClick={() => setShowForm(true)} className="btn-primary text-sm">
-              <Plus size={15} /> Add first record
+              <Plus size={15} /> Додати перший запис
             </button>
           }
         />
@@ -121,7 +121,7 @@ export default function RecordList({ catId, type }: RecordListProps) {
                     )}
                     {record.nextDueDate && (
                       <p className="text-xs text-amber-600">
-                        Next due: {formatDate(record.nextDueDate)}
+                        Наступна дата: {formatDate(record.nextDueDate)}
                       </p>
                     )}
                     {record.notes && (
@@ -136,7 +136,7 @@ export default function RecordList({ catId, type }: RecordListProps) {
       )}
 
       {showForm && (
-        <Modal title={`Add ${typeLabels[type].slice(0, -1)}`} onClose={() => setShowForm(false)}>
+        <Modal title={`Додати ${typeLabels[type].slice(0, -1).toLowerCase()}`} onClose={() => setShowForm(false)}>
           <RecordForm
             catId={catId}
             defaultType={type}
@@ -147,7 +147,7 @@ export default function RecordList({ catId, type }: RecordListProps) {
       )}
 
       {editRecord && (
-        <Modal title="Edit Record" onClose={() => setEditRecord(null)}>
+        <Modal title="Редагувати запис" onClose={() => setEditRecord(null)}>
           <RecordForm
             catId={catId}
             defaultType={type}

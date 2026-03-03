@@ -82,37 +82,37 @@ export default function AppointmentsPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Appointments</h1>
-        <p className="text-sm text-gray-400 mt-0.5">{allScheduled.length} scheduled appointment{allScheduled.length !== 1 ? 's' : ''}</p>
+        <h1 className="text-2xl font-bold text-gray-800">Прийоми</h1>
+        <p className="text-sm text-gray-400 mt-0.5">{allScheduled.length} запланован{allScheduled.length === 1 ? 'ий' : 'их'} прийом{allScheduled.length === 1 ? '' : 'ів'}</p>
       </div>
 
       {allScheduled.length === 0 ? (
         <EmptyState
-          title="No scheduled appointments"
-          description="Appointments scheduled in cat profiles will appear here."
+          title="Запланованих прийомів немає"
+          description="Прийоми, додані у профілях котів, з'являться тут."
         />
       ) : (
         <>
           <Section
-            title="Overdue"
+            title="Прострочені"
             items={overdue}
             icon={<AlertCircle size={16} />}
             highlight="text-red-600"
           />
           <Section
-            title="Today"
+            title="Сьогодні"
             items={today}
             icon={<Clock size={16} />}
             highlight="text-amber-600"
           />
           <Section
-            title="Due this week"
+            title="Цього тижня"
             items={soon}
             icon={<Calendar size={16} />}
             highlight="text-teal-600"
           />
           <Section
-            title="Upcoming"
+            title="Майбутні"
             items={future}
             icon={<Calendar size={16} />}
           />

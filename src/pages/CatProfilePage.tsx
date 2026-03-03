@@ -25,8 +25,8 @@ export default function CatProfilePage() {
   if (!cat) {
     return (
       <div className="text-center py-20">
-        <p className="text-gray-400 mb-4">Cat not found.</p>
-        <Link to="/" className="btn-primary inline-flex">Back to catalog</Link>
+        <p className="text-gray-400 mb-4">Кота не знайдено.</p>
+        <Link to="/" className="btn-primary inline-flex">До каталогу</Link>
       </div>
     );
   }
@@ -37,7 +37,7 @@ export default function CatProfilePage() {
   };
 
   const handleDelete = () => {
-    if (confirm(`Delete ${cat.name} and all their records? This cannot be undone.`)) {
+    if (confirm(`Видалити ${cat.name} та всі записи? Цю дію не можна скасувати.`)) {
       deleteRecordsByCat(cat.id);
       deleteCat(cat.id);
       navigate('/');
@@ -45,16 +45,16 @@ export default function CatProfilePage() {
   };
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
-    { key: 'procedures', label: 'Procedures', icon: <Stethoscope size={15} /> },
-    { key: 'vaccinations', label: 'Vaccinations', icon: <Syringe size={15} /> },
-    { key: 'appointments', label: 'Appointments', icon: <Calendar size={15} /> },
+    { key: 'procedures', label: 'Процедури', icon: <Stethoscope size={15} /> },
+    { key: 'vaccinations', label: 'Вакцинації', icon: <Syringe size={15} /> },
+    { key: 'appointments', label: 'Записи', icon: <Calendar size={15} /> },
   ];
 
   return (
     <div>
       {/* Back */}
       <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-6 transition">
-        <ArrowLeft size={16} /> Back to catalog
+        <ArrowLeft size={16} /> До каталогу
       </Link>
 
       {/* Hero */}
@@ -73,7 +73,7 @@ export default function CatProfilePage() {
                     onClick={() => setShowEdit(true)}
                     className="btn-secondary text-sm py-1.5 px-3"
                   >
-                    <Edit2 size={14} /> Edit
+                    <Edit2 size={14} /> Редагувати
                   </button>
                   <button
                     onClick={handleDelete}
@@ -86,16 +86,16 @@ export default function CatProfilePage() {
 
               <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500">
                 <span>
-                  <span className="font-medium">Age:</span> {formatAge(cat.birthDate)}
+                  <span className="font-medium">Вік:</span> {formatAge(cat.birthDate)}
                 </span>
                 <span>
-                  <span className="font-medium">Born:</span> {formatDate(cat.birthDate)}
+                  <span className="font-medium">Народився:</span> {formatDate(cat.birthDate)}
                 </span>
                 <span>
-                  <span className="font-medium">Sex:</span> {cat.sex === 'male' ? '♂ Male' : '♀ Female'}
+                  <span className="font-medium">Стать:</span> {cat.sex === 'male' ? '♂ Кіт' : '♀ Кішка'}
                 </span>
                 <span>
-                  <span className="font-medium">Color:</span> {cat.color}
+                  <span className="font-medium">Колір:</span> {cat.color}
                 </span>
               </div>
 
@@ -132,7 +132,7 @@ export default function CatProfilePage() {
       </div>
 
       {showEdit && (
-        <Modal title={`Edit ${cat.name}`} onClose={() => setShowEdit(false)}>
+        <Modal title={`Редагувати ${cat.name}`} onClose={() => setShowEdit(false)}>
           <CatForm initialData={cat} onSubmit={handleUpdate} onCancel={() => setShowEdit(false)} />
         </Modal>
       )}

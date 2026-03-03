@@ -41,7 +41,7 @@ export default function Modal({ title, onClose, children, size = 'md' }: ModalPr
           <button
             onClick={onClose}
             className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"
-            aria-label="Close modal"
+            aria-label="Закрити"
           >
             <X size={20} />
           </button>
