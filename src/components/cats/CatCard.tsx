@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Cat } from '../../types';
 import { useRecordsStore } from '../../store/recordsStore';
-import { formatAge } from '../../utils/dateUtils';
+import { formatAge, isOverdue, isDueSoon } from '../../utils/dateUtils';
 import CatAvatar from './CatAvatar';
 import { Calendar, Syringe, Stethoscope } from 'lucide-react';
 
@@ -12,9 +12,13 @@ interface CatCardProps {
 export default function CatCard({ cat }: CatCardProps) {
   const { getRecordsByCat } = useRecordsStore();
   const records = getRecordsByCat(cat.id);
-  const procedures = records.filter((r) => r.type === 'procedure').length;
-  const vaccinations = records.filter((r) => r.type === 'vaccination').length;
+  const procedures = records.filter((r) => r.type === 'procedure' && (r.status === 'scheduled' || r.status === 'ongoing')).length;
   const appointments = records.filter((r) => r.type === 'appointment' && r.status === 'scheduled').length;
+
+  // Show vaccination badge only if any vaccination has a nextDueDate that is overdue or within 7 days
+  const urgentVaccination = records.some(
+    (r) => r.type === 'vaccination' && r.nextDueDate && (isOverdue(r.nextDueDate) || isDueSoon(r.nextDueDate, 7))
+  );
 
   return (
     <Link to={`/cats/${cat.id}`} className="card block hover:shadow-md transition-shadow duration-200">
@@ -32,18 +36,24 @@ export default function CatCard({ cat }: CatCardProps) {
         </div>
 
         <div className="mt-4 flex items-center gap-4 border-t border-gray-50 pt-3">
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <Stethoscope size={13} className="text-blue-400" />
-            <span>{procedures}</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <Syringe size={13} className="text-green-400" />
-            <span>{vaccinations}</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <Calendar size={13} className="text-purple-400" />
-            <span>{appointments} майбутніх</span>
-          </div>
+          {procedures > 0 && (
+            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+              <Stethoscope size={13} className="text-blue-400" />
+              <span>{procedures}</span>
+            </div>
+          )}
+          {urgentVaccination && (
+            <div className="flex items-center gap-1.5 text-xs text-amber-600">
+              <Syringe size={13} className="text-amber-500" />
+              <span>Вакцина</span>
+            </div>
+          )}
+          {appointments > 0 && (
+            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+              <Calendar size={13} className="text-purple-400" />
+              <span>{appointments}</span>
+            </div>
+          )}
         </div>
       </div>
     </Link>

@@ -37,12 +37,13 @@ export interface Cat {
   patron?: Patron;
   adoption?: Adoption;
   adoptionNotes?: string;
+  driveUrl?: string;
   notes?: string;
   createdAt: string;
 }
 
-export type RecordType = 'procedure' | 'vaccination' | 'appointment';
-export type RecordStatus = 'done' | 'scheduled' | 'cancelled';
+export type RecordType = 'procedure' | 'vaccination' | 'appointment' | 'treatment' | 'surgery';
+export type RecordStatus = 'done' | 'scheduled' | 'cancelled' | 'ongoing';
 
 export interface MedicalRecord {
   id: string;
@@ -55,10 +56,27 @@ export interface MedicalRecord {
   notes?: string;
   status: RecordStatus;
   nextDueDate?: string;
+  scheduledTime?: string; // HH:MM for appointments
+  photoUrl?: string;      // photo link, e.g. when marking done
+  // treatment-specific
+  description?: string;
+  drug?: string;
+  dosage?: string;
+  dateEnd?: string;
+  special?: string;
   createdAt: string;
 }
 
 export type UserRole = 'admin' | 'helper';
+
+export interface WeightEntry {
+  id: string;
+  catId: string;
+  date: string; // ISO date
+  weightKg: number;
+  notes?: string;
+  createdAt: string;
+}
 
 export interface User {
   id: string;

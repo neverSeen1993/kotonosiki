@@ -5,51 +5,73 @@ import { useAuth } from '../../hooks/useAuth';
 import { formatDate } from '../../utils/dateUtils';
 import RecordBadge from './RecordBadge';
 import RecordForm from './RecordForm';
+import MarkDoneModal from './MarkDoneModal';
 import Modal from '../ui/Modal';
 import EmptyState from '../ui/EmptyState';
-import { Edit2, Trash2, Plus, ChevronDown, ChevronUp, MapPin, User } from 'lucide-react';
+import { Edit2, Trash2, Plus, ChevronDown, ChevronUp, MapPin, User, CheckCircle } from 'lucide-react';
 
 interface RecordListProps {
   catId: string;
   type: RecordType;
+  catBirthDate?: string;
 }
 
 const typeLabels: Record<RecordType, string> = {
   procedure: 'Лікування',
   vaccination: 'Вакцинації',
   appointment: 'Прийоми',
+  treatment: 'Обробки',
+  surgery: 'Операції',
+};
+
+const addTitles: Record<RecordType, string> = {
+  procedure: 'Додати лікування',
+  vaccination: 'Додати вакцинацію',
+  appointment: 'Додати прийом',
+  treatment: 'Додати обробку',
+  surgery: 'Додати операцію',
 };
 
 const emptyMessages: Record<RecordType, { title: string; description: string }> = {
   procedure: { title: 'Лікування ще немає', description: 'Додайте записи про лікування: операції, процедури або огляди.' },
   vaccination: { title: 'Вакцинацій ще немає', description: 'Відстежуйте щеплення та нагадування про бустери.' },
   appointment: { title: 'Прийомів ще немає', description: 'Заплануйте майбутні візити до ветеринара.' },
+  treatment: { title: 'Обробок ще немає', description: 'Додайте записи про обробки: від бліх, кліщів, глистів тощо.' },
+  surgery: { title: 'Операцій ще немає', description: 'Додайте записи про хірургічні втручання.' },
 };
 
-export default function RecordList({ catId, type }: RecordListProps) {
+export default function RecordList({ catId, type, catBirthDate }: RecordListProps) {
   const { getRecordsByCatAndType, addRecord, updateRecord, deleteRecord } = useRecordsStore();
   const { isAdmin } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editRecord, setEditRecord] = useState<MedicalRecord | null>(null);
+  const [markDoneRecord, setMarkDoneRecord] = useState<MedicalRecord | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   const records = getRecordsByCatAndType(catId, type);
   const empty = emptyMessages[type];
 
-  const handleAdd = (data: Omit<MedicalRecord, 'id' | 'createdAt'>) => {
-    addRecord(data);
+  const handleAdd = async (data: Omit<MedicalRecord, 'id' | 'createdAt'>) => {
+    await addRecord(data);
     setShowForm(false);
   };
 
-  const handleEdit = (data: Omit<MedicalRecord, 'id' | 'createdAt'>) => {
+  const handleEdit = async (data: Omit<MedicalRecord, 'id' | 'createdAt'>) => {
     if (editRecord) {
-      updateRecord(editRecord.id, data);
+      await updateRecord(editRecord.id, data);
       setEditRecord(null);
     }
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Видалити цей запис?')) deleteRecord(id);
+  const handleDelete = async (id: string) => {
+    if (confirm('Видалити цей запис?')) await deleteRecord(id);
+  };
+
+  const handleMarkDone = async (notes?: string, photoUrl?: string) => {
+    if (markDoneRecord) {
+      await updateRecord(markDoneRecord.id, { status: 'done', notes: notes ?? markDoneRecord.notes, photoUrl });
+      setMarkDoneRecord(null);
+    }
   };
 
   return (
@@ -90,11 +112,31 @@ export default function RecordList({ catId, type }: RecordListProps) {
                       <span className="font-medium text-gray-800 text-sm">{record.title}</span>
                       <RecordBadge status={record.status} />
                     </div>
-                    <p className="text-xs text-gray-400 mt-0.5">{formatDate(record.date)}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {record.type === 'procedure'
+                        ? <>
+                            <span>Початок: {formatDate(record.date)}</span>
+                            {record.dateEnd && <span className="ml-3">Кінець: {formatDate(record.dateEnd)}</span>}
+                          </>
+                        : record.type === 'appointment'
+                        ? <>{formatDate(record.date)}{record.scheduledTime && <span className="ml-2 font-medium text-gray-500">{record.scheduledTime}</span>}</>
+                        : formatDate(record.date)
+                      }
+                    </p>
                   </div>
                   <div className="flex items-center gap-1">
                     {isAdmin && (
                       <>
+                        {type === 'appointment' && record.status === 'scheduled' && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setMarkDoneRecord(record); }}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition"
+                            aria-label="Позначити виконаним"
+                            title="Позначити виконаним"
+                          >
+                            <CheckCircle size={15} />
+                          </button>
+                        )}
                         <button
                           onClick={(e) => { e.stopPropagation(); setEditRecord(record); }}
                           className="p-1.5 rounded-lg text-gray-400 hover:text-teal-600 hover:bg-teal-50 transition"
@@ -117,6 +159,18 @@ export default function RecordList({ catId, type }: RecordListProps) {
 
                 {isOpen && (
                   <div className="px-4 pb-3 pt-0 border-t border-gray-100 text-sm text-gray-600 space-y-1">
+                    {record.description && (
+                      <p className="text-xs text-gray-600 whitespace-pre-wrap">{record.description}</p>
+                    )}
+                    {record.drug && (
+                      <p className="text-xs text-gray-600"><span className="font-medium">Препарат:</span> {record.drug}</p>
+                    )}
+                    {record.dosage && (
+                      <p className="text-xs text-gray-600"><span className="font-medium">Дозування:</span> {record.dosage}</p>
+                    )}
+                    {record.special && (
+                      <p className="text-xs text-gray-500 whitespace-pre-wrap"><span className="font-medium">Особливості:</span> {record.special}</p>
+                    )}
                     {record.vet && (
                       <div className="flex items-center gap-1.5">
                         <User size={13} className="text-gray-400" />
@@ -137,6 +191,16 @@ export default function RecordList({ catId, type }: RecordListProps) {
                     {record.notes && (
                       <p className="text-xs text-gray-500 mt-1 whitespace-pre-wrap">{record.notes}</p>
                     )}
+                    {record.photoUrl && (
+                      <a
+                        href={record.photoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-teal-600 hover:underline mt-1"
+                      >
+                        📎 Фото
+                      </a>
+                    )}
                   </div>
                 )}
               </div>
@@ -145,11 +209,22 @@ export default function RecordList({ catId, type }: RecordListProps) {
         </div>
       )}
 
+      {markDoneRecord && (
+        <MarkDoneModal
+          recordTitle={markDoneRecord.title}
+          initialNotes={markDoneRecord.notes}
+          initialPhotoUrl={markDoneRecord.photoUrl}
+          onConfirm={handleMarkDone}
+          onClose={() => setMarkDoneRecord(null)}
+        />
+      )}
+
       {showForm && (
-        <Modal title={`Додати ${typeLabels[type].slice(0, -1).toLowerCase()}`} onClose={() => setShowForm(false)}>
+        <Modal title={addTitles[type]} onClose={() => setShowForm(false)}>
           <RecordForm
             catId={catId}
             defaultType={type}
+            catBirthDate={catBirthDate}
             onSubmit={handleAdd}
             onCancel={() => setShowForm(false)}
           />
@@ -161,6 +236,7 @@ export default function RecordList({ catId, type }: RecordListProps) {
           <RecordForm
             catId={catId}
             defaultType={type}
+            catBirthDate={catBirthDate}
             initialData={editRecord}
             onSubmit={handleEdit}
             onCancel={() => setEditRecord(null)}

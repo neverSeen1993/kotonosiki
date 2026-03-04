@@ -29,6 +29,7 @@ const schema = z.object({
   adoptionPhone2: z.string().optional(),
   adoptionInstagram: z.string().optional(),
   adoptionNotes: z.string().optional(),
+  driveUrl: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -74,6 +75,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           adoptionPhone2: initialData.adoption?.phone2 ?? '',
           adoptionInstagram: initialData.adoption?.instagram ?? '',
           adoptionNotes: initialData.adoptionNotes ?? '',
+          driveUrl: initialData.driveUrl ?? '',
           notes: initialData.notes ?? '',
         }
       : { sex: 'female' },
@@ -101,6 +103,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
         ? ({ date: data.adoptionDate ?? '', from: data.adoptionFrom ?? '', email: data.adoptionEmail || undefined, phone1: data.adoptionPhone1 || undefined, phone2: data.adoptionPhone2 || undefined, instagram: data.adoptionInstagram || undefined } as Adoption)
         : undefined,
       adoptionNotes: data.adoptionNotes || undefined,
+      driveUrl: data.driveUrl || undefined,
       notes: data.notes || undefined,
     });
   };
@@ -147,6 +150,16 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           {...register('photoUrl')}
           className="input"
           placeholder="https://... (необов'язково)"
+        />
+      </div>
+
+      <div>
+        <label className="label">Google Drive папка</label>
+        <input
+          {...register('driveUrl')}
+          className="input"
+          placeholder="https://drive.google.com/..."
+          type="url"
         />
       </div>
 

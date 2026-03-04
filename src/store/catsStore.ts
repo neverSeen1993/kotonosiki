@@ -1,41 +1,42 @@
 import { create } from 'zustand';
 import { Cat } from '../types';
-import { loadCats, saveCats } from '../utils/localStorage';
+import { api } from '../utils/api';
 import { v4 as uuidv4 } from 'uuid';
 
 interface CatsState {
   cats: Cat[];
-  addCat: (cat: Omit<Cat, 'id' | 'createdAt'>) => Cat;
-  updateCat: (id: string, updates: Partial<Omit<Cat, 'id' | 'createdAt'>>) => void;
-  deleteCat: (id: string) => void;
+  loaded: boolean;
+  loadCats: () => Promise<void>;
+  addCat: (cat: Omit<Cat, 'id' | 'createdAt'>) => Promise<Cat>;
+  updateCat: (id: string, updates: Partial<Omit<Cat, 'id' | 'createdAt'>>) => Promise<void>;
+  deleteCat: (id: string) => Promise<void>;
   getCatById: (id: string) => Cat | undefined;
 }
 
 export const useCatsStore = create<CatsState>((set, get) => ({
-  cats: loadCats(),
+  cats: [],
+  loaded: false,
 
-  addCat: (data) => {
-    const cat: Cat = {
-      ...data,
-      id: uuidv4(),
-      createdAt: new Date().toISOString(),
-    };
-    const cats = [...get().cats, cat];
-    set({ cats });
-    saveCats(cats);
+  loadCats: async () => {
+    const cats = await api.get<Cat[]>('/cats');
+    set({ cats, loaded: true });
+  },
+
+  addCat: async (data) => {
+    const cat: Cat = { ...data, id: uuidv4(), createdAt: new Date().toISOString() };
+    await api.post('/cats', cat);
+    set({ cats: [...get().cats, cat] });
     return cat;
   },
 
-  updateCat: (id, updates) => {
-    const cats = get().cats.map((c) => (c.id === id ? { ...c, ...updates } : c));
-    set({ cats });
-    saveCats(cats);
+  updateCat: async (id, updates) => {
+    await api.put(`/cats/${id}`, updates);
+    set({ cats: get().cats.map((c) => (c.id === id ? { ...c, ...updates } : c)) });
   },
 
-  deleteCat: (id) => {
-    const cats = get().cats.filter((c) => c.id !== id);
-    set({ cats });
-    saveCats(cats);
+  deleteCat: async (id) => {
+    await api.del(`/cats/${id}`);
+    set({ cats: get().cats.filter((c) => c.id !== id) });
   },
 
   getCatById: (id) => get().cats.find((c) => c.id === id),

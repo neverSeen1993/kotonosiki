@@ -1,38 +1,44 @@
 import { create } from 'zustand';
-import { AuthSession, UserRole } from '../types';
-import { loadSession, saveSession, loadUsers } from '../utils/localStorage';
+import { AuthSession, User, UserRole } from '../types';
+import { api } from '../utils/api';
 
 interface AuthState {
   session: AuthSession | null;
   isAuthenticated: boolean;
   role: UserRole | null;
-  login: (login: string, password: string) => boolean;
-  logout: () => void;
+  init: () => Promise<void>;
+  login: (login: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  session: loadSession(),
-  isAuthenticated: !!loadSession(),
-  role: loadSession()?.role ?? null,
+  session: null,
+  isAuthenticated: false,
+  role: null,
 
-  login: (login, password) => {
-    const users = loadUsers();
-    const user = users.find(
-      (u) => u.login === login && u.passwordHash === btoa(password)
-    );
+  init: async () => {
+    try {
+      const session = await api.get<AuthSession | null>('/session');
+      if (session?.userId) {
+        set({ session, isAuthenticated: true, role: session.role });
+      }
+    } catch {
+      // no session yet
+    }
+  },
+
+  login: async (login, password) => {
+    const users = await api.get<User[]>('/users');
+    const user = users.find((u) => u.login === login && u.passwordHash === btoa(password));
     if (!user) return false;
-    const session: AuthSession = {
-      userId: user.id,
-      role: user.role,
-      name: user.name,
-    };
-    saveSession(session);
+    const session: AuthSession = { userId: user.id, role: user.role, name: user.name };
+    await api.post('/session', session);
     set({ session, isAuthenticated: true, role: user.role });
     return true;
   },
 
-  logout: () => {
-    saveSession(null);
+  logout: async () => {
+    await api.del('/session');
     set({ session: null, isAuthenticated: false, role: null });
   },
 }));

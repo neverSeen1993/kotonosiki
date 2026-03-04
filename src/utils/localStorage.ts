@@ -1,7 +1,8 @@
-import { Cat, MedicalRecord, User, AuthSession } from '../types';
+import { Cat, MedicalRecord, User, AuthSession, WeightEntry } from '../types';
 
 const CATS_KEY = 'kotonosiki_cats';
 const RECORDS_KEY = 'kotonosiki_records';
+const WEIGHTS_KEY = 'kotonosiki_weights';
 const USERS_KEY = 'kotonosiki_users';
 const SESSION_KEY = 'kotonosiki_session';
 
@@ -51,11 +52,25 @@ export function saveRecords(records: MedicalRecord[]): void {
   localStorage.setItem(RECORDS_KEY, JSON.stringify(records));
 }
 
+export function loadWeights(): WeightEntry[] {
+  try {
+    const raw = localStorage.getItem(WEIGHTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveWeights(weights: WeightEntry[]): void {
+  localStorage.setItem(WEIGHTS_KEY, JSON.stringify(weights));
+}
+
 export function exportData(): string {
   return JSON.stringify(
     {
       cats: loadCats(),
       records: loadRecords(),
+      weights: loadWeights(),
       exportedAt: new Date().toISOString(),
     },
     null,
@@ -68,6 +83,7 @@ export function importData(json: string): boolean {
     const data = JSON.parse(json);
     if (Array.isArray(data.cats)) saveCats(data.cats);
     if (Array.isArray(data.records)) saveRecords(data.records);
+    if (Array.isArray(data.weights)) saveWeights(data.weights);
     return true;
   } catch {
     return false;

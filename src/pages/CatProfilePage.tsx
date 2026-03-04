@@ -7,9 +7,11 @@ import { Cat } from '../types';
 import CatAvatar from '../components/cats/CatAvatar';
 import CatForm from '../components/cats/CatForm';
 import RecordList from '../components/records/RecordList';
+import WeightLog from '../components/cats/WeightLog';
 import Modal from '../components/ui/Modal';
 import { formatAge, formatDate, daysSince } from '../utils/dateUtils';
-import { ArrowLeft, Edit2, Trash2, Stethoscope, Syringe, Calendar, Heart, Home } from 'lucide-react';
+import { useWeightStore } from '../store/weightStore';
+import { ArrowLeft, Edit2, Trash2, Stethoscope, Syringe, Calendar, Heart, Home, Bug, Scale, Scissors, FolderOpen } from 'lucide-react';
 
 const locationLabel: Record<string, string> = {
   big_room: 'Велика кімната',
@@ -18,13 +20,14 @@ const locationLabel: Record<string, string> = {
   foster_home: 'Домашня перетримка',
 };
 
-type Tab = 'procedures' | 'vaccinations' | 'appointments';
+type Tab = 'procedures' | 'vaccinations' | 'appointments' | 'treatment' | 'surgery' | 'weight';
 
 export default function CatProfilePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getCatById, updateCat, deleteCat } = useCatsStore();
   const { deleteRecordsByCat } = useRecordsStore();
+  const { deleteWeightsByCat } = useWeightStore();
   const { isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('procedures');
   const [showEdit, setShowEdit] = useState(false);
@@ -40,23 +43,27 @@ export default function CatProfilePage() {
     );
   }
 
-  const handleUpdate = (data: Omit<Cat, 'id' | 'createdAt'>) => {
-    updateCat(cat.id, data);
+  const handleUpdate = async (data: Omit<Cat, 'id' | 'createdAt'>) => {
+    await updateCat(cat.id, data);
     setShowEdit(false);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (confirm(`Видалити ${cat.name} та всі записи? Цю дію не можна скасувати.`)) {
-      deleteRecordsByCat(cat.id);
-      deleteCat(cat.id);
+      await deleteRecordsByCat(cat.id);
+      await deleteWeightsByCat(cat.id);
+      await deleteCat(cat.id);
       navigate('/');
     }
   };
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'procedures', label: 'Лікування', icon: <Stethoscope size={15} /> },
-    { key: 'vaccinations', label: 'Вакцинації', icon: <Syringe size={15} /> },
     { key: 'appointments', label: 'Записи', icon: <Calendar size={15} /> },
+    { key: 'treatment', label: 'Обробки', icon: <Bug size={15} /> },
+    { key: 'vaccinations', label: 'Вакцинації', icon: <Syringe size={15} /> },
+    { key: 'surgery', label: 'Операції', icon: <Scissors size={15} /> },
+    { key: 'weight', label: 'Вага', icon: <Scale size={15} /> },
   ];
 
   return (
@@ -164,6 +171,19 @@ export default function CatProfilePage() {
                   <p className="text-sm text-gray-500 whitespace-pre-wrap">{cat.notes}</p>
                 </div>
               )}
+
+              {cat.driveUrl && (
+                <div className="mt-2">
+                  <a
+                    href={cat.driveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-sm text-teal-600 hover:text-teal-700 hover:underline transition"
+                  >
+                    <FolderOpen size={15} /> Google Drive папка
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -260,9 +280,12 @@ export default function CatProfilePage() {
 
       {/* Tab content */}
       <div className="card p-6">
-        {activeTab === 'procedures' && <RecordList catId={cat.id} type="procedure" />}
-        {activeTab === 'vaccinations' && <RecordList catId={cat.id} type="vaccination" />}
-        {activeTab === 'appointments' && <RecordList catId={cat.id} type="appointment" />}
+        {activeTab === 'procedures' && <RecordList catId={cat.id} type="procedure" catBirthDate={cat.birthDate} />}
+        {activeTab === 'appointments' && <RecordList catId={cat.id} type="appointment" catBirthDate={cat.birthDate} />}
+        {activeTab === 'treatment' && <RecordList catId={cat.id} type="treatment" catBirthDate={cat.birthDate} />}
+        {activeTab === 'vaccinations' && <RecordList catId={cat.id} type="vaccination" catBirthDate={cat.birthDate} />}
+        {activeTab === 'surgery' && <RecordList catId={cat.id} type="surgery" catBirthDate={cat.birthDate} />}
+        {activeTab === 'weight' && <WeightLog catId={cat.id} />}
       </div>
 
       {isAdmin && showEdit && (

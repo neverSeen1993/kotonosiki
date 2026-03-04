@@ -52,17 +52,25 @@ export default function CatalogPage() {
     return true;
   });
 
-  const handleAdd = (data: Omit<Cat, 'id' | 'createdAt'>) => {
-    addCat(data);
+  const handleAdd = async (data: Omit<Cat, 'id' | 'createdAt'>) => {
+    await addCat(data);
     setShowForm(false);
   };
+
+  const inCamp = cats.filter((c) => c.location !== 'foster_home').length;
+  const inFoster = cats.filter((c) => c.location === 'foster_home').length;
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Каталог котів</h1>
-          <p className="text-sm text-gray-400 mt-0.5">{cats.length} котик{cats.length === 1 ? '' : cats.length >= 2 && cats.length <= 4 ? 'и' : 'ів'} зареєстровано</p>
+          <h1 className="text-2xl font-bold text-gray-800">КОТО-табір</h1>
+          <div className="flex gap-4 mt-0.5">
+            <p className="text-sm text-gray-400">Всього котиків в таборі: <span className="font-medium text-gray-600">{inCamp}</span></p>
+            {inFoster > 0 && (
+              <p className="text-sm text-gray-400">Домашня перетримка: <span className="font-medium text-gray-600">{inFoster}</span></p>
+            )}
+          </div>
         </div>
         {isAdmin && (
           <button onClick={() => setShowForm(true)} className="btn-primary">

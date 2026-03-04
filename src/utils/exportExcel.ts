@@ -25,7 +25,6 @@ const locationLabel: Record<string, string> = {
   kids_room: 'Дитяча кімната',
   foster_home: 'Домашня перетримка',
 };
-
 export function exportToExcel(): void {
   const cats = loadCats();
   const records = loadRecords();

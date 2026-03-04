@@ -1,14 +1,17 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Cat, LayoutGrid, Calendar, Download, Upload, LogOut, ShieldCheck, Eye, FileSpreadsheet } from 'lucide-react';
+import { Cat, LayoutGrid, Calendar, Download, Upload, LogOut, ShieldCheck, Eye, FileSpreadsheet, Stethoscope, ClipboardList } from 'lucide-react';
 import { useRecordsStore } from '../../store/recordsStore';
-import { exportData, importData } from '../../utils/localStorage';
 import { exportToExcel } from '../../utils/exportExcel';
 import { useCatsStore } from '../../store/catsStore';
+import { useWeightStore } from '../../store/weightStore';
 import { useAuth } from '../../hooks/useAuth';
+import { api } from '../../utils/api';
+import { Cat as CatType, MedicalRecord, WeightEntry } from '../../types';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const { getUpcomingAppointments } = useRecordsStore();
-  const { cats } = useCatsStore();
+  const { getUpcomingAppointments, loadRecords } = useRecordsStore();
+  const { cats, loadCats } = useCatsStore();
+  const { loadWeights } = useWeightStore();
   const { session, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -20,13 +23,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     return d < today;
   }).length;
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/login', { replace: true });
   };
 
-  const handleExport = () => {
-    const json = exportData();
+  const handleExport = async () => {
+    const [cats, records, weights] = await Promise.all([
+      api.get<CatType[]>('/cats'),
+      api.get<MedicalRecord[]>('/records'),
+      api.get<WeightEntry[]>('/weights'),
+    ]);
+    const json = JSON.stringify({ cats, records, weights, exportedAt: new Date().toISOString() }, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -44,11 +52,21 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        const text = ev.target?.result as string;
-        if (importData(text)) {
-          window.location.reload();
-        } else {
+      reader.onload = async (ev) => {
+        try {
+          const data = JSON.parse(ev.target?.result as string);
+          if (Array.isArray(data.cats)) {
+            for (const cat of data.cats) await api.post('/cats', cat);
+          }
+          if (Array.isArray(data.records)) {
+            for (const r of data.records) await api.post('/records', r);
+          }
+          if (Array.isArray(data.weights)) {
+            for (const w of data.weights) await api.post('/weights', w);
+          }
+          await Promise.all([loadCats(), loadRecords(), loadWeights()]);
+          alert('Імпорт успішний!');
+        } catch {
           alert('Невірний файл резервної копії');
         }
       };
@@ -58,13 +76,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   };
 
   const navItems = [
-    { to: '/', label: 'Каталог', icon: <LayoutGrid size={18} />, exact: true },
+    { to: '/', label: 'КОТО-табір', icon: <LayoutGrid size={18} />, exact: true },
     {
       to: '/appointments',
       label: 'Прийоми',
       icon: <Calendar size={18} />,
       badge: overdueCount > 0 ? overdueCount : null,
     },
+    { to: '/treatments', label: 'Лікування', icon: <Stethoscope size={18} />, exact: false },
+    { to: '/plans', label: 'План процедур', icon: <ClipboardList size={18} />, exact: false },
   ];
 
   const RoleBadge = () => (

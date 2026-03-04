@@ -1,0 +1,75 @@
+[
+  {
+    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
+    "title": "Nobivac Tricat",
+    "date": "2026-03-03",
+    "type": "vaccination",
+    "status": "done",
+    "nextDueDate": "2027-03-03",
+    "id": "a50a315b-a447-4a7b-a822-abeca60796d0",
+    "createdAt": "2026-03-03T20:34:50.299Z"
+  },
+  {
+    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
+    "title": "Перевірити вушка",
+    "date": "2026-03-02",
+    "type": "appointment",
+    "status": "done",
+    "vet": "Терапевт",
+    "clinic": "Київ Вет Поділ",
+    "scheduledTime": "11:30",
+    "id": "f5765c2e-b52f-4e7d-b409-85c01d7f3a1e",
+    "createdAt": "2026-03-03T20:37:10.638Z"
+  },
+  {
+    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
+    "title": "Стронгхолд Плюс",
+    "date": "2026-03-04",
+    "type": "treatment",
+    "status": "done",
+    "id": "3b32afa6-cecd-4f49-8b61-a3590f89f6af",
+    "createdAt": "2026-03-03T22:50:13.290Z"
+  },
+  {
+    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
+    "title": "Стрес",
+    "date": "2026-02-23",
+    "type": "procedure",
+    "status": "ongoing",
+    "description": "Досипаємо Зілкене в корм.",
+    "drug": "Зілкене",
+    "dosage": "1 таб в день",
+    "dateEnd": "2026-05-03",
+    "id": "49111da7-4285-4283-beb3-7fd232892720",
+    "createdAt": "2026-03-03T23:19:37.343Z"
+  },
+  {
+    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
+    "title": "СтронгХолд Плюс",
+    "date": "2026-05-04",
+    "type": "treatment",
+    "status": "scheduled",
+    "id": "3b882dcc-e9f9-49a9-b87a-96c78a2731de",
+    "createdAt": "2026-03-04T00:00:56.831Z"
+  },
+  {
+    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
+    "title": "fgh",
+    "date": "2026-03-13",
+    "type": "appointment",
+    "status": "scheduled",
+    "scheduledTime": "05:47",
+    "id": "a392f522-aa4f-4d2a-91fb-3b93dd85cef6",
+    "createdAt": "2026-03-04T01:45:28.523Z"
+  },
+  {
+    "catId": "80acb6e8-7d0f-4d5e-b066-7affd6b755b2",
+    "title": "ds",
+    "date": "2026-03-05",
+    "type": "vaccination",
+    "status": "scheduled",
+    "id": "f8a26471-84cb-4263-ba63-61b650bf87ff",
+    "createdAt": "2026-03-04T01:52:28.011Z",
+    "nextDueDate": "2027-03-05"
+  }
+]

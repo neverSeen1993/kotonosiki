@@ -15,20 +15,17 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    // small timeout for UX feel
-    setTimeout(() => {
-      const ok = login(loginVal.trim(), password);
-      setLoading(false);
-      if (ok) {
-        navigate(from, { replace: true });
-      } else {
-        setError('Невірний логін або пароль');
-      }
-    }, 300);
+    const ok = await login(loginVal.trim(), password);
+    setLoading(false);
+    if (ok) {
+      navigate(from, { replace: true });
+    } else {
+      setError('Невірний логін або пароль');
+    }
   };
 
   return (

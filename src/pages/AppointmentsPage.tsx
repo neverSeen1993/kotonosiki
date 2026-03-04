@@ -1,16 +1,29 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useRecordsStore } from '../store/recordsStore';
 import { useCatsStore } from '../store/catsStore';
+import { MedicalRecord } from '../types';
 import { formatDate } from '../utils/dateUtils';
 import { isOverdue, isDueToday, isDueSoon } from '../utils/dateUtils';
 import RecordBadge from '../components/records/RecordBadge';
+import MarkDoneModal from '../components/records/MarkDoneModal';
 import CatAvatar from '../components/cats/CatAvatar';
 import EmptyState from '../components/ui/EmptyState';
-import { Calendar, AlertCircle, Clock } from 'lucide-react';
+import { Calendar, AlertCircle, Clock, CheckCircle } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 export default function AppointmentsPage() {
-  const { records } = useRecordsStore();
+  const { records, updateRecord } = useRecordsStore();
   const { getCatById } = useCatsStore();
+  const { isAdmin } = useAuth();
+  const [markDoneRecord, setMarkDoneRecord] = useState<MedicalRecord | null>(null);
+
+  const handleMarkDone = async (notes?: string, photoUrl?: string) => {
+    if (markDoneRecord) {
+      await updateRecord(markDoneRecord.id, { status: 'done', notes: notes ?? markDoneRecord.notes, photoUrl });
+      setMarkDoneRecord(null);
+    }
+  };
 
   // Include overdue (past scheduled appointments)
   const allScheduled = records
@@ -67,10 +80,22 @@ export default function AppointmentsPage() {
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-gray-500">{formatDate(record.date)}</p>
+                  <p className="text-xs text-gray-500">
+                    {formatDate(record.date)}
+                    {record.scheduledTime && <span className="ml-1.5 font-medium text-gray-600">{record.scheduledTime}</span>}
+                  </p>
                   {record.vet && <p className="text-xs text-gray-400">{record.vet}</p>}
                 </div>
                 <RecordBadge status={record.status} />
+                {isAdmin && (
+                  <button
+                    onClick={() => setMarkDoneRecord(record)}
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition shrink-0"
+                    title="Позначити виконаним"
+                  >
+                    <CheckCircle size={17} />
+                  </button>
+                )}
               </div>
             );
           })}
@@ -117,6 +142,15 @@ export default function AppointmentsPage() {
             icon={<Calendar size={16} />}
           />
         </>
+      )}
+      {markDoneRecord && (
+        <MarkDoneModal
+          recordTitle={markDoneRecord.title}
+          initialNotes={markDoneRecord.notes}
+          initialPhotoUrl={markDoneRecord.photoUrl}
+          onConfirm={handleMarkDone}
+          onClose={() => setMarkDoneRecord(null)}
+        />
       )}
     </div>
   );
