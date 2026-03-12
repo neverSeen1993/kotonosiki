@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: kotonosyky
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    disk:
+      name: kotonosyky-data
+      mountPath: /opt/render/project/src/server/data
+      sizeGB: 1

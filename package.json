@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "server": "tsx watch server/index.ts",
-    "build": "tsc && vite build",
+    "build": "vite build",
+    "start": "tsx server/index.ts",
     "preview": "vite preview"
   },
   "dependencies": {

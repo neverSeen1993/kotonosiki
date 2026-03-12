@@ -41,8 +41,8 @@ const emptyMessages: Record<RecordType, { title: string; description: string }> 
 };
 
 export default function RecordList({ catId, type, catBirthDate }: RecordListProps) {
-  const { getRecordsByCatAndType, addRecord, updateRecord, deleteRecord } = useRecordsStore();
-  const { isAdmin } = useAuth();
+  const { getRecordsByCatAndType, getRecordsByCat, addRecord, updateRecord, deleteRecord } = useRecordsStore();
+  const { canEdit } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editRecord, setEditRecord] = useState<MedicalRecord | null>(null);
   const [markDoneRecord, setMarkDoneRecord] = useState<MedicalRecord | null>(null);
@@ -53,23 +53,57 @@ export default function RecordList({ catId, type, catBirthDate }: RecordListProp
 
   const handleAdd = async (data: Omit<MedicalRecord, 'id' | 'createdAt'>) => {
     await addRecord(data);
+    // Auto-create a scheduled vaccination for the next due date
+    if (data.type === 'vaccination' && data.nextDueDate) {
+      await addRecord({
+        catId: data.catId,
+        type: 'vaccination',
+        title: data.title,
+        date: data.nextDueDate,
+        status: 'scheduled',
+      });
+    }
     setShowForm(false);
   };
 
   const handleEdit = async (data: Omit<MedicalRecord, 'id' | 'createdAt'>) => {
     if (editRecord) {
       await updateRecord(editRecord.id, data);
+      // Auto-create a scheduled vaccination for the next due date if it changed
+      if (data.type === 'vaccination' && data.nextDueDate && data.nextDueDate !== editRecord.nextDueDate) {
+        await addRecord({
+          catId: data.catId,
+          type: 'vaccination',
+          title: data.title,
+          date: data.nextDueDate,
+          status: 'scheduled',
+        });
+      }
       setEditRecord(null);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Видалити цей запис?')) await deleteRecord(id);
+    if (!confirm('Видалити цей запис?')) return;
+    const record = records.find((r) => r.id === id);
+    await deleteRecord(id);
+    // Also delete the linked scheduled vaccination if one exists with matching date
+    if (record?.type === 'vaccination' && record.nextDueDate) {
+      const allCatRecords = getRecordsByCat(catId);
+      const linked = allCatRecords.find(
+        (r) => r.type === 'vaccination' &&
+               r.status === 'scheduled' &&
+               r.date === record.nextDueDate &&
+               r.title === record.title &&
+               r.id !== id
+      );
+      if (linked) await deleteRecord(linked.id);
+    }
   };
 
   const handleMarkDone = async (notes?: string, photoUrl?: string) => {
     if (markDoneRecord) {
-      await updateRecord(markDoneRecord.id, { status: 'done', notes: notes ?? markDoneRecord.notes, photoUrl });
+      await updateRecord(markDoneRecord.id, { status: 'done', doneNotes: notes, photoUrl });
       setMarkDoneRecord(null);
     }
   };
@@ -78,7 +112,7 @@ export default function RecordList({ catId, type, catBirthDate }: RecordListProp
     <div>
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-gray-700">{typeLabels[type]}</h3>
-        {isAdmin && (
+        {canEdit && (
           <button onClick={() => setShowForm(true)} className="btn-primary text-sm py-1.5 px-3">
             <Plus size={15} /> Додати
           </button>
@@ -90,7 +124,7 @@ export default function RecordList({ catId, type, catBirthDate }: RecordListProp
           title={empty.title}
           description={empty.description}
           action={
-            isAdmin ? (
+            canEdit ? (
               <button onClick={() => setShowForm(true)} className="btn-primary text-sm">
                 <Plus size={15} /> Додати перший запис
               </button>
@@ -125,18 +159,39 @@ export default function RecordList({ catId, type, catBirthDate }: RecordListProp
                     </p>
                   </div>
                   <div className="flex items-center gap-1">
-                    {isAdmin && (
+                    {canEdit && (
                       <>
-                        {type === 'appointment' && record.status === 'scheduled' && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setMarkDoneRecord(record); }}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition"
-                            aria-label="Позначити виконаним"
-                            title="Позначити виконаним"
-                          >
-                            <CheckCircle size={15} />
-                          </button>
-                        )}
+                        {type === 'appointment' && record.status === 'scheduled' && (() => {
+                          const today = new Date().toISOString().slice(0, 10);
+                          const isToday = record.date === today;
+                          return (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); if (isToday) setMarkDoneRecord(record); }}
+                              disabled={!isToday}
+                              className={`p-1.5 rounded-lg transition ${isToday ? 'text-gray-400 hover:text-green-600 hover:bg-green-50' : 'text-gray-200 cursor-not-allowed'}`}
+                              aria-label="Позначити виконаним"
+                              title={isToday ? 'Позначити виконаним' : `Можна позначити виконаним лише в день запису (${formatDate(record.date)})`}
+                            >
+                              <CheckCircle size={15} />
+                            </button>
+                          );
+                        })()}
+                        {type === 'procedure' && record.status === 'ongoing' && (() => {
+                          const today = new Date().toISOString().slice(0, 10);
+                          const checkDate = record.dateEnd ?? record.date;
+                          const canComplete = today >= checkDate;
+                          return (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); if (canComplete) setMarkDoneRecord(record); }}
+                              disabled={!canComplete}
+                              className={`p-1.5 rounded-lg transition ${canComplete ? 'text-gray-400 hover:text-green-600 hover:bg-green-50' : 'text-gray-200 cursor-not-allowed'}`}
+                              aria-label="Позначити виконаним"
+                              title={canComplete ? 'Позначити виконаним' : `Лікування завершується ${formatDate(checkDate)}`}
+                            >
+                              <CheckCircle size={15} />
+                            </button>
+                          );
+                        })()}
                         <button
                           onClick={(e) => { e.stopPropagation(); setEditRecord(record); }}
                           className="p-1.5 rounded-lg text-gray-400 hover:text-teal-600 hover:bg-teal-50 transition"
@@ -185,22 +240,42 @@ export default function RecordList({ catId, type, catBirthDate }: RecordListProp
                     )}
                     {record.nextDueDate && (
                       <p className="text-xs text-amber-600">
-                        Наступна дата: {formatDate(record.nextDueDate)}
+                        Наступна вакцинація: {formatDate(record.nextDueDate)}
                       </p>
                     )}
                     {record.notes && (
                       <p className="text-xs text-gray-500 mt-1 whitespace-pre-wrap">{record.notes}</p>
                     )}
-                    {record.photoUrl && (
-                      <a
-                        href={record.photoUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-teal-600 hover:underline mt-1"
-                      >
-                        📎 Фото
-                      </a>
+                    {record.doneNotes && (
+                      <div className="mt-1 bg-green-50 rounded-lg px-2 py-1.5">
+                        <p className="text-xs font-semibold text-green-600 mb-0.5">Результати</p>
+                        <p className="text-xs text-gray-600 whitespace-pre-wrap">{record.doneNotes}</p>
+                      </div>
                     )}
+                    {record.photoUrl && (() => {
+                      let src = record.photoUrl;
+                      const match = src.match(/(?:\/d\/|id=|uc\?id=)([a-zA-Z0-9_-]{25,})/);
+                      if (match) src = `https://lh3.googleusercontent.com/d/${match[1]}=s800`;
+                      return (
+                        <a href={record.photoUrl} target="_blank" rel="noopener noreferrer" className="block mt-2">
+                          <img
+                            src={src}
+                            alt="Фото"
+                            className="rounded-lg max-h-48 object-cover border border-gray-100"
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              img.style.display = 'none';
+                              const link = document.createElement('a');
+                              link.href = record.photoUrl!;
+                              link.target = '_blank';
+                              link.className = 'inline-flex items-center gap-1 text-xs text-teal-600 hover:underline mt-1';
+                              link.textContent = '📎 Фото';
+                              img.parentElement?.appendChild(link);
+                            }}
+                          />
+                        </a>
+                      );
+                    })()}
                   </div>
                 )}
               </div>

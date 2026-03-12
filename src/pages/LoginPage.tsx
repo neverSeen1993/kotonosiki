@@ -50,7 +50,6 @@ export default function LoginPage() {
                 value={loginVal}
                 onChange={(e) => setLoginVal(e.target.value)}
                 className="input"
-                placeholder="admin"
                 autoComplete="username"
                 autoFocus
                 required
@@ -94,13 +93,6 @@ export default function LoginPage() {
               {loading ? 'Вхід...' : 'Увійти'}
             </button>
           </form>
-        </div>
-
-        {/* Hint */}
-        <div className="mt-4 text-xs text-gray-400 text-center space-y-1">
-          <p>Демо-доступ:</p>
-          <p><span className="font-mono bg-gray-100 px-1 rounded">admin</span> / <span className="font-mono bg-gray-100 px-1 rounded">admin123</span> — Адміністратор</p>
-          <p><span className="font-mono bg-gray-100 px-1 rounded">helper</span> / <span className="font-mono bg-gray-100 px-1 rounded">helper123</span> — Помічник</p>
         </div>
       </div>
     </div>

@@ -9,18 +9,18 @@ import RecordBadge from '../components/records/RecordBadge';
 import MarkDoneModal from '../components/records/MarkDoneModal';
 import CatAvatar from '../components/cats/CatAvatar';
 import EmptyState from '../components/ui/EmptyState';
-import { Calendar, AlertCircle, Clock, CheckCircle } from 'lucide-react';
+import { Calendar, AlertCircle, Clock, CheckCircle, FolderOpen } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 export default function AppointmentsPage() {
   const { records, updateRecord } = useRecordsStore();
   const { getCatById } = useCatsStore();
-  const { isAdmin } = useAuth();
+  const { canEdit } = useAuth();
   const [markDoneRecord, setMarkDoneRecord] = useState<MedicalRecord | null>(null);
 
   const handleMarkDone = async (notes?: string, photoUrl?: string) => {
     if (markDoneRecord) {
-      await updateRecord(markDoneRecord.id, { status: 'done', notes: notes ?? markDoneRecord.notes, photoUrl });
+      await updateRecord(markDoneRecord.id, { status: 'done', doneNotes: notes, photoUrl });
       setMarkDoneRecord(null);
     }
   };
@@ -87,15 +87,32 @@ export default function AppointmentsPage() {
                   {record.vet && <p className="text-xs text-gray-400">{record.vet}</p>}
                 </div>
                 <RecordBadge status={record.status} />
-                {isAdmin && (
-                  <button
-                    onClick={() => setMarkDoneRecord(record)}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition shrink-0"
-                    title="Позначити виконаним"
+                {cat?.driveUrl && (
+                  <a
+                    href={cat.driveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-teal-600 hover:bg-teal-50 transition shrink-0"
+                    title="Відкрити Google Drive"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    <CheckCircle size={17} />
-                  </button>
+                    <FolderOpen size={17} />
+                  </a>
                 )}
+                {canEdit && (() => {
+                  const today = new Date().toISOString().slice(0, 10);
+                  const isToday = record.date === today;
+                  return (
+                    <button
+                      onClick={() => { if (isToday) setMarkDoneRecord(record); }}
+                      disabled={!isToday}
+                      className={`p-1.5 rounded-lg transition shrink-0 ${isToday ? 'text-gray-400 hover:text-green-600 hover:bg-green-50' : 'text-gray-200 cursor-not-allowed'}`}
+                      title={isToday ? 'Позначити виконаним' : `Можна позначити виконаним лише в день запису (${formatDate(record.date)})`}
+                    >
+                      <CheckCircle size={17} />
+                    </button>
+                  );
+                })()}
               </div>
             );
           })}
@@ -148,6 +165,7 @@ export default function AppointmentsPage() {
           recordTitle={markDoneRecord.title}
           initialNotes={markDoneRecord.notes}
           initialPhotoUrl={markDoneRecord.photoUrl}
+          driveUrl={getCatById(markDoneRecord.catId)?.driveUrl}
           onConfirm={handleMarkDone}
           onClose={() => setMarkDoneRecord(null)}
         />

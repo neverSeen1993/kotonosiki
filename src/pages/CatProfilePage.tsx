@@ -11,7 +11,7 @@ import WeightLog from '../components/cats/WeightLog';
 import Modal from '../components/ui/Modal';
 import { formatAge, formatDate, daysSince } from '../utils/dateUtils';
 import { useWeightStore } from '../store/weightStore';
-import { ArrowLeft, Edit2, Trash2, Stethoscope, Syringe, Calendar, Heart, Home, Bug, Scale, Scissors, FolderOpen } from 'lucide-react';
+import { ArrowLeft, Edit2, Trash2, Stethoscope, Syringe, Calendar, HandHeart, Home, Bug, Scale, FolderOpen, Heart, Globe, ExternalLink } from 'lucide-react';
 
 const locationLabel: Record<string, string> = {
   big_room: 'Велика кімната',
@@ -20,15 +20,15 @@ const locationLabel: Record<string, string> = {
   foster_home: 'Домашня перетримка',
 };
 
-type Tab = 'procedures' | 'vaccinations' | 'appointments' | 'treatment' | 'surgery' | 'weight';
+type Tab = 'procedures' | 'vaccinations' | 'appointments' | 'treatment' | 'weight';
 
 export default function CatProfilePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getCatById, updateCat, deleteCat } = useCatsStore();
-  const { deleteRecordsByCat } = useRecordsStore();
+  const { deleteRecordsByCat, getRecordsByCat, updateRecord } = useRecordsStore();
   const { deleteWeightsByCat } = useWeightStore();
-  const { isAdmin } = useAuth();
+  const { canEdit } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('procedures');
   const [showEdit, setShowEdit] = useState(false);
 
@@ -44,7 +44,21 @@ export default function CatProfilePage() {
   }
 
   const handleUpdate = async (data: Omit<Cat, 'id' | 'createdAt'>) => {
+    const wasAdopted = !!cat.adoption?.date;
+    const nowAdopted = !!data.adoption?.date;
+
     await updateCat(cat.id, data);
+
+    if (!wasAdopted && nowAdopted) {
+      const records = getRecordsByCat(cat.id);
+      const toCancel = records.filter(
+        (r) => r.status === 'scheduled' || r.status === 'ongoing',
+      );
+      await Promise.all(
+        toCancel.map((r) => updateRecord(r.id, { status: 'cancelled' })),
+      );
+    }
+
     setShowEdit(false);
   };
 
@@ -59,10 +73,9 @@ export default function CatProfilePage() {
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'procedures', label: 'Лікування', icon: <Stethoscope size={15} /> },
-    { key: 'appointments', label: 'Записи', icon: <Calendar size={15} /> },
+    { key: 'appointments', label: 'Прийоми', icon: <Calendar size={15} /> },
     { key: 'treatment', label: 'Обробки', icon: <Bug size={15} /> },
-    { key: 'vaccinations', label: 'Вакцинації', icon: <Syringe size={15} /> },
-    { key: 'surgery', label: 'Операції', icon: <Scissors size={15} /> },
+    { key: 'vaccinations', label: 'Вакцинація', icon: <Syringe size={15} /> },
     { key: 'weight', label: 'Вага', icon: <Scale size={15} /> },
   ];
 
@@ -82,10 +95,32 @@ export default function CatProfilePage() {
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-800">{cat.name}</h1>
-                  <p className="text-gray-500">{cat.breed}</p>
+                  {(cat.fiv || cat.felv || cat.sterilised !== undefined) && (
+                    <div className="flex gap-1.5 mt-1.5">
+                      {cat.fiv && (
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold tracking-wide ${
+                          cat.fiv === 'positive' ? 'bg-red-100 text-red-700' :
+                          cat.fiv === 'negative' ? 'bg-green-100 text-green-700' :
+                          'bg-gray-100 text-gray-500'
+                        }`}>FIV</span>
+                      )}
+                      {cat.felv && (
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold tracking-wide ${
+                          cat.felv === 'positive' ? 'bg-red-100 text-red-700' :
+                          cat.felv === 'negative' ? 'bg-green-100 text-green-700' :
+                          'bg-gray-100 text-gray-500'
+                        }`}>FeLV</span>
+                      )}
+                      {cat.sterilised !== undefined && (
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold tracking-wide ${cat.sterilised ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-500'}`}>
+                          {cat.sterilised ? 'Стерилізовано' : 'Не стерилізовано'}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
-                  {isAdmin && (
+                  {canEdit && (
                     <>
                       <button
                         onClick={() => setShowEdit(true)}
@@ -105,12 +140,16 @@ export default function CatProfilePage() {
               </div>
 
               <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500">
-                <span>
-                  <span className="font-medium">Вік:</span> {formatAge(cat.birthDate)}
-                </span>
-                <span>
-                  <span className="font-medium">Дата народження:</span> {formatDate(cat.birthDate)}
-                </span>
+                {cat.birthDate && (
+                  <span>
+                    <span className="font-medium">Вік:</span> {formatAge(cat.birthDate)}
+                  </span>
+                )}
+                {cat.birthDate && (
+                  <span>
+                    <span className="font-medium">Дата народження:</span> {formatDate(cat.birthDate)}
+                  </span>
+                )}
                 {cat.arrivalDate && (
                   <span>
                     <span className="font-medium">Дата прибуття:</span> {formatDate(cat.arrivalDate)}
@@ -132,21 +171,6 @@ export default function CatProfilePage() {
                 {cat.origin && (
                   <span>
                     <span className="font-medium">Звідки:</span> {cat.origin}
-                  </span>
-                )}
-                {cat.fiv && (
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${cat.fiv === 'positive' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                    FIV {cat.fiv === 'positive' ? 'позитивний' : 'негативний'}
-                  </span>
-                )}
-                {cat.felv && (
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${cat.felv === 'positive' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                    FeLV {cat.felv === 'positive' ? 'позитивний' : 'негативний'}
-                  </span>
-                )}
-                {cat.sterilised !== undefined && (
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cat.sterilised ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-500'}`}>
-                    Стерилізація: {cat.sterilised ? 'Так' : 'Ні'}
                   </span>
                 )}
               </div>
@@ -180,7 +204,7 @@ export default function CatProfilePage() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-sm text-teal-600 hover:text-teal-700 hover:underline transition"
                   >
-                    <FolderOpen size={15} /> Google Drive папка
+                    <FolderOpen size={15} /> Папка із фото
                   </a>
                 </div>
               )}
@@ -193,7 +217,7 @@ export default function CatProfilePage() {
       {cat.patron?.name ? (
         <div className="card mb-6 p-5">
           <div className="flex items-center gap-2 mb-3">
-            <Heart size={15} className="text-pink-500" />
+            <HandHeart size={15} className="text-pink-500" />
             <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Патрон</h2>
           </div>
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500">
@@ -216,12 +240,44 @@ export default function CatProfilePage() {
             )}
           </div>
         </div>
-      ) : isAdmin && (
+      ) : canEdit && (
         <div className="card mb-6 p-4 border-dashed border-2 border-gray-200 flex items-center gap-3 text-gray-400 text-sm">
           <Heart size={15} className="text-gray-300" />
           Патрон не призначений — натисніть «Редагувати», щоб додати
         </div>
       )}
+
+      {/* Promotion */}
+      {cat.promotion && (cat.promotion.website || cat.promotion.gladpet || cat.promotion.happyPaw || (cat.promotion.extraLinks && cat.promotion.extraLinks.length > 0)) ? (
+        <div className="card mb-6 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Globe size={15} className="text-indigo-500" />
+            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Публікації на сайтах</h2>
+          </div>
+          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-500">
+            {cat.promotion.website !== undefined && (
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cat.promotion.website ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                Сайт: {cat.promotion.website ? 'Так' : 'Ні'}
+              </span>
+            )}
+            {cat.promotion.gladpet && (
+              <a href={cat.promotion.gladpet} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-teal-600 hover:underline">
+                <ExternalLink size={13} /> GladPet
+              </a>
+            )}
+            {cat.promotion.happyPaw && (
+              <a href={cat.promotion.happyPaw} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-teal-600 hover:underline">
+                <ExternalLink size={13} /> Happy Paw
+              </a>
+            )}
+            {cat.promotion.extraLinks?.map((link, idx) => (
+              <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-teal-600 hover:underline">
+                <ExternalLink size={13} /> {link.name}
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       {/* Adoption */}
       {cat.adoption?.date || cat.adoption?.from ? (
@@ -284,11 +340,10 @@ export default function CatProfilePage() {
         {activeTab === 'appointments' && <RecordList catId={cat.id} type="appointment" catBirthDate={cat.birthDate} />}
         {activeTab === 'treatment' && <RecordList catId={cat.id} type="treatment" catBirthDate={cat.birthDate} />}
         {activeTab === 'vaccinations' && <RecordList catId={cat.id} type="vaccination" catBirthDate={cat.birthDate} />}
-        {activeTab === 'surgery' && <RecordList catId={cat.id} type="surgery" catBirthDate={cat.birthDate} />}
         {activeTab === 'weight' && <WeightLog catId={cat.id} />}
       </div>
 
-      {isAdmin && showEdit && (
+      {canEdit && showEdit && (
         <Modal title={`Редагувати ${cat.name}`} onClose={() => setShowEdit(false)}>
           <CatForm initialData={cat} onSubmit={handleUpdate} onCancel={() => setShowEdit(false)} />
         </Modal>

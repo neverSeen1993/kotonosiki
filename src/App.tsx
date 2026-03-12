@@ -6,7 +6,9 @@ import CatalogPage from './pages/CatalogPage';
 import CatProfilePage from './pages/CatProfilePage';
 import AppointmentsPage from './pages/AppointmentsPage';
 import TreatmentsPage from './pages/TreatmentsPage';
-import PlansPage from './pages/PlansPage';
+import ScheduledPage from './pages/ScheduledPage';
+import LogPage from './pages/LogPage';
+import AdoptedPage from './pages/AdoptedPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
@@ -23,7 +25,9 @@ export default function App() {
                 <Route path="/cats/:id" element={<CatProfilePage />} />
                 <Route path="/appointments" element={<AppointmentsPage />} />
                 <Route path="/treatments" element={<TreatmentsPage />} />
-                <Route path="/plans" element={<PlansPage />} />
+                <Route path="/scheduled" element={<ScheduledPage />} />
+                <Route path="/adopted" element={<AdoptedPage />} />
+                <Route path="/log" element={<LogPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </AppShell>

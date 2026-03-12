@@ -31,7 +31,19 @@ export const useCatsStore = create<CatsState>((set, get) => ({
 
   updateCat: async (id, updates) => {
     await api.put(`/cats/${id}`, updates);
-    set({ cats: get().cats.map((c) => (c.id === id ? { ...c, ...updates } : c)) });
+    set({
+      cats: get().cats.map((c) => {
+        if (c.id !== id) return c;
+        const merged = { ...c, ...updates };
+        // Remove keys explicitly set to null (cleared fields)
+        for (const key of Object.keys(updates)) {
+          if ((updates as Record<string, unknown>)[key] === null) {
+            delete (merged as Record<string, unknown>)[key];
+          }
+        }
+        return merged as Cat;
+      }),
+    });
   },
 
   deleteCat: async (id) => {

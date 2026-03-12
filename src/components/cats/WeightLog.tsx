@@ -62,7 +62,7 @@ function WeightForm({ catId, initialData, onSubmit, onCancel }: WeightFormProps)
 
 export default function WeightLog({ catId }: { catId: string }) {
   const { getWeightsByCat, addWeight, updateWeight, deleteWeight } = useWeightStore();
-  const { isAdmin } = useAuth();
+  const { canEdit } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editEntry, setEditEntry] = useState<WeightEntry | null>(null);
 
@@ -94,7 +94,7 @@ export default function WeightLog({ catId }: { catId: string }) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-gray-700">Вага</h3>
-        {isAdmin && (
+        {canEdit && (
           <button onClick={() => setShowForm(true)} className="btn-primary text-sm py-1.5 px-3">
             <Plus size={15} /> Додати
           </button>
@@ -105,7 +105,7 @@ export default function WeightLog({ catId }: { catId: string }) {
         <EmptyState
           title="Записів ваги ще немає"
           description="Відстежуйте динаміку ваги кота."
-          action={isAdmin ? (
+          action={canEdit ? (
             <button onClick={() => setShowForm(true)} className="btn-primary text-sm">
               <Plus size={15} /> Додати перший запис
             </button>
@@ -136,7 +136,7 @@ export default function WeightLog({ catId }: { catId: string }) {
                   <p className="text-xs text-gray-400 mt-0.5">{formatDate(entry.date)}</p>
                   {entry.notes && <p className="text-xs text-gray-500 mt-0.5">{entry.notes}</p>}
                 </div>
-                {isAdmin && (
+                {canEdit && (
                   <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => setEditEntry(entry)}

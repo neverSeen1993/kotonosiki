@@ -1,16 +1,37 @@
 [
   {
-    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
-    "date": "2026-03-04",
-    "weightKg": 3.45,
-    "id": "95012b1d-0bdf-4b83-8ab6-5801ea7a0e52",
-    "createdAt": "2026-03-03T23:23:26.107Z"
+    "catId": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "date": "2026-03-11",
+    "weightKg": 45,
+    "id": "973f5758-1078-42a6-b45a-10cf093a9bb6",
+    "createdAt": "2026-03-11T00:53:11.898Z"
   },
   {
-    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
-    "date": "2026-02-23",
-    "weightKg": 3,
-    "id": "0ab3ab56-92d9-4ea7-9349-5e1a61722081",
-    "createdAt": "2026-03-03T23:23:33.810Z"
+    "catId": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "date": "2026-03-11",
+    "weightKg": 46,
+    "id": "ff632e9f-ef12-467c-a260-cd02bdefff21",
+    "createdAt": "2026-03-11T00:53:15.541Z"
+  },
+  {
+    "catId": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "date": "2026-03-11",
+    "weightKg": 76,
+    "id": "f3154594-ed27-4015-a385-19bd20c843c4",
+    "createdAt": "2026-03-11T00:53:27.881Z"
+  },
+  {
+    "catId": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "date": "2026-03-06",
+    "weightKg": 56,
+    "id": "fe32bb3b-ed36-4136-ad28-d83d3028615b",
+    "createdAt": "2026-03-11T00:53:39.021Z"
+  },
+  {
+    "catId": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "date": "2026-03-19",
+    "weightKg": 567,
+    "id": "7e55bfa9-b676-4aa5-8441-21097e58c07a",
+    "createdAt": "2026-03-11T21:04:44.464Z"
   }
 ]

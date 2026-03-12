@@ -14,5 +14,13 @@
     "passwordHash": "aGVscGVyMTIz",
     "role": "helper",
     "createdAt": "2026-03-04T00:57:36.866Z"
+  },
+  {
+    "id": "user-viewer",
+    "name": "Adoption Guard",
+    "login": "adoption",
+    "passwordHash": "YWRvcHRpb24xMjM=",
+    "role": "viewer",
+    "createdAt": "2026-03-04T00:57:36.867Z"
   }
 ]

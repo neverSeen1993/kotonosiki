@@ -1,5 +1,6 @@
 import { Cat } from '../../types';
 import { Cat as CatIcon } from 'lucide-react';
+import { getDriveImageUrl } from '../../utils/driveImage';
 
 interface CatAvatarProps {
   cat: Cat;
@@ -17,10 +18,12 @@ const sizeMap = {
 export default function CatAvatar({ cat, size = 'md', className = '' }: CatAvatarProps) {
   const { outer, icon } = sizeMap[size];
 
-  if (cat.photoUrl) {
+  const imgSrc = getDriveImageUrl(cat.photoUrl) || getDriveImageUrl(cat.driveUrl) || cat.photoUrl;
+
+  if (imgSrc) {
     return (
       <div className={`${outer} rounded-full overflow-hidden flex-shrink-0 ${className}`}>
-        <img src={cat.photoUrl} alt={cat.name} className="w-full h-full object-cover" />
+        <img src={imgSrc} alt={cat.name} className="w-full h-full object-cover" />
       </div>
     );
   }

@@ -8,7 +8,7 @@ export interface Patron {
   phone?: string;
 }
 
-export type TestResult = 'positive' | 'negative';
+export type TestResult = 'positive' | 'negative' | 'not_tested';
 
 export interface Adoption {
   date: string;          // ISO date
@@ -17,6 +17,18 @@ export interface Adoption {
   phone1?: string;
   phone2?: string;
   instagram?: string;
+}
+
+export interface PromotionLink {
+  name: string;
+  url: string;
+}
+
+export interface Promotion {
+  website: boolean;
+  gladpet?: string;
+  happyPaw?: string;
+  extraLinks?: PromotionLink[];
 }
 
 export interface Cat {
@@ -37,6 +49,7 @@ export interface Cat {
   patron?: Patron;
   adoption?: Adoption;
   adoptionNotes?: string;
+  promotion?: Promotion;
   driveUrl?: string;
   notes?: string;
   createdAt: string;
@@ -54,6 +67,7 @@ export interface MedicalRecord {
   vet?: string;
   clinic?: string;
   notes?: string;
+  doneNotes?: string;   // notes added when marking as done — separate from the record's own notes
   status: RecordStatus;
   nextDueDate?: string;
   scheduledTime?: string; // HH:MM for appointments
@@ -67,7 +81,7 @@ export interface MedicalRecord {
   createdAt: string;
 }
 
-export type UserRole = 'admin' | 'helper';
+export type UserRole = 'admin' | 'helper' | 'viewer';
 
 export interface WeightEntry {
   id: string;
@@ -92,3 +106,23 @@ export interface AuthSession {
   role: UserRole;
   name: string;
 }
+
+export interface FieldChange {
+  field: string;
+  before: unknown;
+  after: unknown;
+}
+
+export interface LogEntry {
+  id: string;
+  timestamp: string;
+  userId: string;
+  userName: string;
+  action: 'create' | 'update' | 'delete';
+  collection: string;
+  entityId?: string;
+  details: string;
+  changes?: FieldChange[];
+  snapshot?: Record<string, unknown>;
+}
+

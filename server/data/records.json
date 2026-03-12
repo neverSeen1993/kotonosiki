@@ -1,75 +1,77 @@
 [
   {
-    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
-    "title": "Nobivac Tricat",
-    "date": "2026-03-03",
-    "type": "vaccination",
-    "status": "done",
-    "nextDueDate": "2027-03-03",
-    "id": "a50a315b-a447-4a7b-a822-abeca60796d0",
-    "createdAt": "2026-03-03T20:34:50.299Z"
+    "catId": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "title": "Зуби",
+    "date": "2026-03-12",
+    "type": "surgery",
+    "status": "cancelled",
+    "id": "36b7040e-af7e-480c-8cdf-1c1787c152d0",
+    "createdAt": "2026-03-11T00:43:32.812Z"
   },
   {
-    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
-    "title": "Перевірити вушка",
-    "date": "2026-03-02",
+    "catId": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "title": "Огляд",
+    "date": "2026-03-11",
     "type": "appointment",
-    "status": "done",
-    "vet": "Терапевт",
-    "clinic": "Київ Вет Поділ",
-    "scheduledTime": "11:30",
-    "id": "f5765c2e-b52f-4e7d-b409-85c01d7f3a1e",
-    "createdAt": "2026-03-03T20:37:10.638Z"
+    "status": "cancelled",
+    "id": "57ca1279-eafb-40de-868e-6274eecbe430",
+    "createdAt": "2026-03-11T00:49:43.927Z"
   },
   {
-    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
-    "title": "Стронгхолд Плюс",
-    "date": "2026-03-04",
+    "catId": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "title": "Стронг",
+    "date": "2026-03-20",
     "type": "treatment",
-    "status": "done",
-    "id": "3b32afa6-cecd-4f49-8b61-a3590f89f6af",
-    "createdAt": "2026-03-03T22:50:13.290Z"
+    "status": "cancelled",
+    "id": "749a994c-18f3-4de6-b3c5-8948f0400c01",
+    "createdAt": "2026-03-11T00:50:18.689Z"
   },
   {
-    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
-    "title": "Стрес",
-    "date": "2026-02-23",
+    "catId": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "title": "Сказ",
+    "date": "2026-03-20",
+    "type": "vaccination",
+    "status": "cancelled",
+    "id": "30047530-ef82-46e1-90f4-4b0c7e36fd46",
+    "createdAt": "2026-03-11T00:50:52.021Z"
+  },
+  {
+    "catId": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "title": "Отит",
+    "date": "2026-03-11",
     "type": "procedure",
-    "status": "ongoing",
-    "description": "Досипаємо Зілкене в корм.",
-    "drug": "Зілкене",
-    "dosage": "1 таб в день",
-    "dateEnd": "2026-05-03",
-    "id": "49111da7-4285-4283-beb3-7fd232892720",
-    "createdAt": "2026-03-03T23:19:37.343Z"
+    "status": "cancelled",
+    "vet": "уфмсу",
+    "clinic": "іфсу",
+    "notes": "уауц",
+    "description": "пкцаувіацукпцка",
+    "drug": "Амокс",
+    "dosage": "07",
+    "dateEnd": "2026-03-18",
+    "special": "ваму",
+    "id": "2987bbcc-ada5-497c-8633-e53eb38b233c",
+    "createdAt": "2026-03-11T01:14:17.871Z"
   },
   {
-    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
-    "title": "СтронгХолд Плюс",
-    "date": "2026-05-04",
-    "type": "treatment",
+    "catId": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "title": "dfghj",
+    "date": "2026-03-11",
+    "type": "procedure",
     "status": "scheduled",
-    "id": "3b882dcc-e9f9-49a9-b87a-96c78a2731de",
-    "createdAt": "2026-03-04T00:00:56.831Z"
+    "description": "cvbhj",
+    "drug": "vbnm",
+    "dosage": "678",
+    "dateEnd": "2026-03-19",
+    "id": "66f6e9a5-907d-4a97-abbc-b1e26da41a3b",
+    "createdAt": "2026-03-11T21:00:34.951Z"
   },
   {
-    "catId": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
-    "title": "fgh",
-    "date": "2026-03-13",
-    "type": "appointment",
-    "status": "scheduled",
-    "scheduledTime": "05:47",
-    "id": "a392f522-aa4f-4d2a-91fb-3b93dd85cef6",
-    "createdAt": "2026-03-04T01:45:28.523Z"
-  },
-  {
-    "catId": "80acb6e8-7d0f-4d5e-b066-7affd6b755b2",
-    "title": "ds",
-    "date": "2026-03-05",
+    "catId": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "title": "cvghj",
+    "date": "2026-03-19",
     "type": "vaccination",
     "status": "scheduled",
-    "id": "f8a26471-84cb-4263-ba63-61b650bf87ff",
-    "createdAt": "2026-03-04T01:52:28.011Z",
-    "nextDueDate": "2027-03-05"
+    "id": "3a0cdb6f-95a7-4a1a-8128-7c95e63cfe0f",
+    "createdAt": "2026-03-11T21:00:59.033Z"
   }
 ]

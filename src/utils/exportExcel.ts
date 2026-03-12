@@ -1,17 +1,20 @@
 import * as XLSX from 'xlsx';
-import { loadCats, loadRecords } from './localStorage';
+import { Cat, MedicalRecord, WeightEntry } from '../types';
 import { formatDate, daysSince } from './dateUtils';
 
 const typeLabel: Record<string, string> = {
   procedure: 'Лікування',
   vaccination: 'Вакцинація',
   appointment: 'Прийом',
+  treatment: 'Обробка',
+  surgery: 'Операція',
 };
 
 const statusLabel: Record<string, string> = {
   done: 'Виконано',
   scheduled: 'Заплановано',
   cancelled: 'Скасовано',
+  ongoing: 'Виконується',
 };
 
 const sexLabel: Record<string, string> = {
@@ -25,24 +28,26 @@ const locationLabel: Record<string, string> = {
   kids_room: 'Дитяча кімната',
   foster_home: 'Домашня перетримка',
 };
-export function exportToExcel(): void {
-  const cats = loadCats();
-  const records = loadRecords();
+
+const testResultLabel = (v?: string) =>
+  v === 'positive' ? 'Позитивний' : v === 'negative' ? 'Негативний' : v === 'not_tested' ? 'Не тестували' : '';
+
+export function exportToExcel(cats: Cat[], records: MedicalRecord[], weights: WeightEntry[] = []): void {
+  const catMap = Object.fromEntries(cats.map((c) => [c.id, c.name]));
 
   // ── Sheet 1: Коти ──────────────────────────────────────────────
   const catsRows = cats.map((c) => ({
     "Ім'я": c.name,
-    'Порода': c.breed,
     'Стать': sexLabel[c.sex] ?? c.sex,
-    'Дата народження': formatDate(c.birthDate),
+    'Дата народження': c.birthDate ? formatDate(c.birthDate) : '',
+    'Колір': c.color,
     'Дата прибуття': c.arrivalDate ? formatDate(c.arrivalDate) : '',
     'Днів з прибуття': c.arrivalDate ? String(daysSince(c.arrivalDate)) : '',
     'Місцезнаходження': c.location ? (locationLabel[c.location] ?? c.location) : '',
     'Звідки': c.origin ?? '',
-    'FIV': c.fiv === 'positive' ? 'Позитивний' : c.fiv === 'negative' ? 'Негативний' : '',
-    'FeLV': c.felv === 'positive' ? 'Позитивний' : c.felv === 'negative' ? 'Негативний' : '',
+    'FIV': testResultLabel(c.fiv),
+    'FeLV': testResultLabel(c.felv),
     'Стерилізація': c.sterilised === true ? 'Так' : c.sterilised === false ? 'Ні' : '',
-    'Колір': c.color,
     'Нотатки': c.notes ?? '',
     'Історія': c.history ?? '',
     'Особливості прилаштування': c.adoptionNotes ?? '',
@@ -57,33 +62,88 @@ export function exportToExcel(): void {
     'Адопція — телефон 1': c.adoption?.phone1 ?? '',
     'Адопція — телефон 2': c.adoption?.phone2 ?? '',
     'Адопція — Instagram': c.adoption?.instagram ?? '',
+    'Сайт притулку': c.promotion?.website ? 'Так' : c.promotion?.website === false ? 'Ні' : '',
+    'GladPet': c.promotion?.gladpet ?? '',
+    'Happy Paw': c.promotion?.happyPaw ?? '',
+    'Інші сайти': c.promotion?.extraLinks?.map((l) => `${l.name}: ${l.url}`).join('; ') ?? '',
+    'Google Drive': c.driveUrl ?? '',
     'Додано': formatDate(c.createdAt),
   }));
 
-  // ── Sheet 2: Записи ────────────────────────────────────────────
-  const catMap = Object.fromEntries(cats.map((c) => [c.id, c.name]));
-
-  const recordsRows = records.map((r) => ({
+  // ── Sheet 2: Лікування (procedure) ────────────────────────────
+  const procedures = records.filter((r) => r.type === 'procedure');
+  const procedureRows = procedures.map((r) => ({
     'Кіт': catMap[r.catId] ?? r.catId,
-    'Тип': typeLabel[r.type] ?? r.type,
+    'Діагноз': r.title,
+    'Дата початку': formatDate(r.date),
+    'Дата закінчення': r.dateEnd ? formatDate(r.dateEnd) : '',
+    'Статус': statusLabel[r.status] ?? r.status,
+    'Опис': r.description ?? '',
+    'Препарат': r.drug ?? '',
+    'Дозування': r.dosage ?? '',
+    'Особливості': r.special ?? '',
+    'Результати': r.doneNotes ?? '',
+    'Фото': r.photoUrl ?? '',
+    'Додано': formatDate(r.createdAt),
+  }));
+
+  // ── Sheet 3: Вакцинація (vaccination) ──────────────────────────
+  const vaccinations = records.filter((r) => r.type === 'vaccination');
+  const vaccinationRows = vaccinations.map((r) => ({
+    'Кіт': catMap[r.catId] ?? r.catId,
     'Назва': r.title,
     'Дата': formatDate(r.date),
     'Статус': statusLabel[r.status] ?? r.status,
+    'Наступна вакцинація': r.nextDueDate ? formatDate(r.nextDueDate) : '',
+    'Нотатки': r.notes ?? '',
+    'Результати': r.doneNotes ?? '',
+    'Фото': r.photoUrl ?? '',
+    'Додано': formatDate(r.createdAt),
+  }));
+
+  // ── Sheet 4: Обробки (treatment) ──────────────────────────────
+  const treatments = records.filter((r) => r.type === 'treatment');
+  const treatmentRows = treatments.map((r) => ({
+    'Кіт': catMap[r.catId] ?? r.catId,
+    'Назва': r.title,
+    'Дата': formatDate(r.date),
+    'Статус': statusLabel[r.status] ?? r.status,
+    'Нотатки': r.notes ?? '',
+    'Результати': r.doneNotes ?? '',
+    'Фото': r.photoUrl ?? '',
+    'Додано': formatDate(r.createdAt),
+  }));
+
+  // ── Sheet 5: Прийоми (appointment) ────────────────────────────
+  const appointments = records.filter((r) => r.type === 'appointment');
+  const appointmentRows = appointments.map((r) => ({
+    'Кіт': catMap[r.catId] ?? r.catId,
+    'Назва': r.title,
+    'Дата': formatDate(r.date),
+    'Час': r.scheduledTime ?? '',
+    'Статус': statusLabel[r.status] ?? r.status,
     'Ветеринар': r.vet ?? '',
     'Клініка': r.clinic ?? '',
-    'Наступна дата': r.nextDueDate ? formatDate(r.nextDueDate) : '',
     'Нотатки': r.notes ?? '',
+    'Результати': r.doneNotes ?? '',
+    'Фото': r.photoUrl ?? '',
     'Додано': formatDate(r.createdAt),
+  }));
+
+  // ── Sheet 6: Вага ──────────────────────────────────────────────
+  const weightRows = weights.map((w) => ({
+    'Кіт': catMap[w.catId] ?? w.catId,
+    'Дата': formatDate(w.date),
+    'Вага (кг)': w.weightKg,
+    'Нотатки': w.notes ?? '',
+    'Додано': formatDate(w.createdAt),
   }));
 
   // ── Build workbook ─────────────────────────────────────────────
   const wb = XLSX.utils.book_new();
 
-  const wsCats = XLSX.utils.json_to_sheet(catsRows.length ? catsRows : [{}]);
-  const wsRecords = XLSX.utils.json_to_sheet(recordsRows.length ? recordsRows : [{}]);
-
   // Auto-width columns
-  const autoWidth = (ws: XLSX.WorkSheet, rows: Record<string, string>[]) => {
+  const autoWidth = (ws: XLSX.WorkSheet, rows: Record<string, unknown>[]) => {
     if (!rows.length) return;
     const cols = Object.keys(rows[0]);
     ws['!cols'] = cols.map((key) => ({
@@ -91,11 +151,18 @@ export function exportToExcel(): void {
     }));
   };
 
-  autoWidth(wsCats, catsRows);
-  autoWidth(wsRecords, recordsRows);
+  const addSheet = (name: string, rows: Record<string, unknown>[]) => {
+    const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{}]);
+    autoWidth(ws, rows);
+    XLSX.utils.book_append_sheet(wb, ws, name);
+  };
 
-  XLSX.utils.book_append_sheet(wb, wsCats, 'Коти');
-  XLSX.utils.book_append_sheet(wb, wsRecords, 'Записи');
+  addSheet('Коти', catsRows);
+  addSheet('Лікування', procedureRows);
+  addSheet('Вакцинація', vaccinationRows);
+  addSheet('Обробки', treatmentRows);
+  addSheet('Прийоми', appointmentRows);
+  addSheet('Вага', weightRows);
 
   const date = new Date().toISOString().slice(0, 10);
   XLSX.writeFile(wb, `kotonosyky-${date}.xlsx`);

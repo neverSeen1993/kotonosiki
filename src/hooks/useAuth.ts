@@ -8,6 +8,8 @@ export function useAuth() {
     role,
     isAdmin: role === 'admin',
     isHelper: role === 'helper',
+    isViewer: role === 'viewer',
+    canEdit: role === 'admin' || role === 'helper',
     login,
     logout,
   };

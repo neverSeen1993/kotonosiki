@@ -6,7 +6,7 @@ import CatCard from '../components/cats/CatCard';
 import CatForm from '../components/cats/CatForm';
 import Modal from '../components/ui/Modal';
 import EmptyState from '../components/ui/EmptyState';
-import { Plus, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Plus, Search, SlidersHorizontal, X, Bug, Syringe, Calendar, Stethoscope, Info } from 'lucide-react';
 
 type PatronFilter = 'all' | 'with' | 'without';
 type FivFilter = 'all' | 'positive' | 'negative' | 'unknown';
@@ -21,7 +21,8 @@ const locationLabel: Record<CatLocation, string> = {
 
 export default function CatalogPage() {
   const { cats, addCat } = useCatsStore();
-  const { isAdmin } = useAuth();
+  const { canEdit } = useAuth();
+  const [showLegend, setShowLegend] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -41,7 +42,9 @@ export default function CatalogPage() {
     setLocationFilter('all');
   };
 
-  const filtered = cats.filter((c) => {
+  const activeCats = cats.filter((c) => !c.adoption?.date);
+
+  const filtered = activeCats.filter((c) => {
     if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
     if (patronFilter === 'with' && !c.patron?.name) return false;
     if (patronFilter === 'without' && c.patron?.name) return false;
@@ -57,30 +60,54 @@ export default function CatalogPage() {
     setShowForm(false);
   };
 
-  const inCamp = cats.filter((c) => c.location !== 'foster_home').length;
-  const inFoster = cats.filter((c) => c.location === 'foster_home').length;
+  const inBigRoom = activeCats.filter((c) => c.location === 'big_room').length;
+  const inKidsRoom = activeCats.filter((c) => c.location === 'kids_room').length;
+  const inQuarantine = activeCats.filter((c) => c.location === 'quarantine').length;
+  const inFoster = activeCats.filter((c) => c.location === 'foster_home').length;
+  const inCampTotal = inBigRoom + inKidsRoom + inQuarantine;
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">КОТО-табір</h1>
-          <div className="flex gap-4 mt-0.5">
-            <p className="text-sm text-gray-400">Всього котиків в таборі: <span className="font-medium text-gray-600">{inCamp}</span></p>
-            {inFoster > 0 && (
-              <p className="text-sm text-gray-400">Домашня перетримка: <span className="font-medium text-gray-600">{inFoster}</span></p>
-            )}
+          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-gray-400">
+            <span>Всього в таборі: <span className="font-medium text-gray-600">{inCampTotal}</span></span>
+            <span>Велика кімната: <span className="font-medium text-gray-600">{inBigRoom}</span></span>
+            <span>Дитяча кімната: <span className="font-medium text-gray-600">{inKidsRoom}</span></span>
+            <span>Карантин: <span className="font-medium text-gray-600">{inQuarantine}</span></span>
+            <span>Домашня перетримка: <span className="font-medium text-gray-600">{inFoster}</span></span>
           </div>
         </div>
-        {isAdmin && (
+        {canEdit && (
           <button onClick={() => setShowForm(true)} className="btn-primary">
             <Plus size={18} /> Додати кота
           </button>
         )}
       </div>
 
-      {cats.length > 0 && (
+      {activeCats.length > 0 && (
         <>
+          {/* Badge legend */}
+          <div className="mb-4">
+            <button
+              onClick={() => setShowLegend((v) => !v)}
+              className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition"
+            >
+              <Info size={12} />
+              Позначки
+              <span className="text-gray-300">{showLegend ? '▲' : '▼'}</span>
+            </button>
+            {showLegend && (
+              <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-gray-400 bg-gray-50 rounded-xl px-4 py-2.5 border border-gray-100">
+                <span className="flex items-center gap-1"><Bug size={12} className="text-blue-500" /> — обробка цього тижня</span>
+                <span className="flex items-center gap-1"><Syringe size={12} className="text-green-500" /> — вакцинація цього тижня / прострочена</span>
+                <span className="flex items-center gap-1"><Stethoscope size={12} className="text-blue-400" /> — активне лікування</span>
+                <span className="flex items-center gap-1"><Calendar size={12} className="text-purple-400" /> — заплановані записи</span>
+                <span className="flex items-center gap-1"><span className="px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">FIV</span> / <span className="px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">FeLV</span> — позитивний тест</span>
+              </div>
+            )}
+          </div>
           {/* Search + filter toggle */}
           <div className="flex gap-2 mb-3">
             <div className="relative flex-1">
@@ -177,12 +204,12 @@ export default function CatalogPage() {
         </>
       )}
 
-      {cats.length === 0 ? (
+      {activeCats.length === 0 ? (
         <EmptyState
           title="Котів ще немає"
           description="Додайте першого кота, щоб розпочати відстеження його здоров'я."
           action={
-            isAdmin ? (
+            canEdit ? (
               <button onClick={() => setShowForm(true)} className="btn-primary">
                 <Plus size={18} /> Додати першого кота
               </button>
@@ -199,7 +226,7 @@ export default function CatalogPage() {
         </div>
       )}
 
-      {isAdmin && showForm && (
+      {canEdit && showForm && (
         <Modal title="Додати нового кота" onClose={() => setShowForm(false)}>
           <CatForm onSubmit={handleAdd} onCancel={() => setShowForm(false)} />
         </Modal>

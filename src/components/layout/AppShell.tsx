@@ -1,5 +1,5 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Cat, LayoutGrid, Calendar, Download, Upload, LogOut, ShieldCheck, Eye, FileSpreadsheet, Stethoscope, ClipboardList } from 'lucide-react';
+import { Cat, LayoutGrid, Calendar, Download, Upload, LogOut, ShieldCheck, Eye, FileSpreadsheet, Stethoscope, ClipboardList, ScrollText, Heart } from 'lucide-react';
 import { useRecordsStore } from '../../store/recordsStore';
 import { exportToExcel } from '../../utils/exportExcel';
 import { useCatsStore } from '../../store/catsStore';
@@ -9,10 +9,10 @@ import { api } from '../../utils/api';
 import { Cat as CatType, MedicalRecord, WeightEntry } from '../../types';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const { getUpcomingAppointments, loadRecords } = useRecordsStore();
+  const { getUpcomingAppointments, loadRecords, records } = useRecordsStore();
   const { cats, loadCats } = useCatsStore();
-  const { loadWeights } = useWeightStore();
-  const { session, isAdmin, logout } = useAuth();
+  const { loadWeights, weights } = useWeightStore();
+  const { session, isAdmin, canEdit, logout } = useAuth();
   const navigate = useNavigate();
 
   const upcoming = getUpcomingAppointments();
@@ -84,24 +84,26 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       badge: overdueCount > 0 ? overdueCount : null,
     },
     { to: '/treatments', label: 'Лікування', icon: <Stethoscope size={18} />, exact: false },
-    { to: '/plans', label: 'План процедур', icon: <ClipboardList size={18} />, exact: false },
+    { to: '/scheduled', label: 'Заплановані маніпуляції', icon: <ClipboardList size={18} />, exact: false },
+    { to: '/adopted', label: 'Прилаштовані', icon: <Heart size={18} />, exact: false },
+    ...(isAdmin ? [{ to: '/log', label: 'Журнал змін', icon: <ScrollText size={18} />, exact: false }] : []),
   ];
 
   const RoleBadge = () => (
     <span
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-        isAdmin ? 'bg-teal-100 text-teal-700' : 'bg-amber-100 text-amber-700'
+        isAdmin ? 'bg-teal-100 text-teal-700' : canEdit ? 'bg-amber-100 text-amber-700' : 'bg-purple-100 text-purple-700'
       }`}
     >
       {isAdmin ? <ShieldCheck size={11} /> : <Eye size={11} />}
-      {isAdmin ? 'Адмін' : 'Помічник'}
+      {isAdmin ? 'Адмін' : canEdit ? 'Помічник' : 'Adoption Guard'}
     </span>
   );
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="hidden md:flex md:flex-col md:w-56 bg-white border-r border-gray-100 px-3 py-6 flex-shrink-0">
+      <aside className="hidden md:flex md:flex-col md:w-56 bg-white border-r border-gray-100 px-3 py-6 flex-shrink-0 sticky top-0 h-screen overflow-y-auto">
         <Link to="/" className="flex items-center gap-2 px-3 mb-8">
           <Cat size={28} className="text-teal-500" />
           <span className="text-xl font-bold text-gray-800">Котоносики</span>
@@ -148,7 +150,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 <Download size={16} /> Експорт копії (JSON)
               </button>
               <button
-                onClick={exportToExcel}
+                onClick={() => exportToExcel(cats, records, weights)}
                 className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-gray-500 hover:bg-gray-50 w-full transition"
               >
                 <FileSpreadsheet size={16} /> Експорт в Excel

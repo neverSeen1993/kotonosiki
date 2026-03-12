@@ -1,46 +1,21 @@
 [
   {
-    "name": "Луна",
+    "name": "Мурчелло",
     "breed": "Метис",
-    "birthDate": "2025-07-30",
-    "sex": "female",
-    "color": "Біло-сіра",
-    "id": "7bcce0a0-0a15-4343-9318-5b5d1d505dd7",
-    "createdAt": "2026-03-03T20:33:53.638Z",
-    "arrivalDate": "2025-02-24",
-    "location": "kids_room",
-    "origin": "Київ",
-    "history": "Жінка прихистила на час морозів, але її кіт не прийняв. Хочуть прилаштувати.",
-    "patron": {
-      "name": "Олена",
-      "since": "2026-02-24",
-      "origin": "Подруга розказала про нас",
-      "instagram": "hellohello",
-      "phone": "0953808463"
-    },
-    "fiv": "negative",
-    "felv": "negative",
-    "adoptionNotes": "Киця дуже ляклива, треба спокій та терпіння. ",
-    "sterilised": false,
-    "driveUrl": "https://www.youtube.com/"
-  },
-  {
-    "name": "Мур мур",
-    "breed": "Метис",
-    "birthDate": "2025-10-28",
+    "birthDate": "2025-02-05",
     "sex": "male",
-    "color": "табі",
-    "arrivalDate": "2026-02-02",
+    "color": "Чорний із білим",
+    "arrivalDate": "2026-03-02",
     "location": "big_room",
+    "origin": "Соломянка",
     "fiv": "positive",
     "felv": "negative",
-    "patron": {
-      "name": "так так ",
-      "since": "2026-02-23",
-      "origin": ""
-    },
-    "id": "80acb6e8-7d0f-4d5e-b066-7affd6b755b2",
-    "createdAt": "2026-03-03T22:08:27.144Z",
-    "sterilised": false
+    "sterilised": true,
+    "id": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "createdAt": "2026-03-11T00:26:40.664Z",
+    "promotion": {
+      "website": false,
+      "gladpet": "https://gladpet.org/pet/18705"
+    }
   }
 ]

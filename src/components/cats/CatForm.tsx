@@ -1,22 +1,24 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Cat, CatLocation, Patron, TestResult, Adoption } from '../../types';
+import { useState } from 'react';
+import { Cat, CatLocation, Patron, TestResult, Adoption, Promotion, PromotionLink } from '../../types';
+import { Plus, Trash2 } from 'lucide-react';
 
 const schema = z.object({
   name: z.string().min(1, "Ім'я обов'язкове"),
-  breed: z.string().min(1, "Порода обов'язкова"),
-  birthDate: z.string().min(1, "Дата народження обов'язкова"),
-  sex: z.enum(['male', 'female']),
-  color: z.string().min(1, "Колір обов'язковий"),
+  breed: z.string().optional(),
+  birthDate: z.string().optional(),
+  sex: z.enum(['male', 'female', '']).optional(),
+  color: z.string().optional(),
   photoUrl: z.string().optional(),
   arrivalDate: z.string().optional(),
-  location: z.enum(['big_room', 'quarantine', 'kids_room', 'foster_home']).optional(),
+  location: z.enum(['big_room', 'quarantine', 'kids_room', 'foster_home', '']).optional(),
   origin: z.string().optional(),
   history: z.string().optional(),
-  fiv: z.enum(['positive', 'negative']).optional(),
-  felv: z.enum(['positive', 'negative']).optional(),
-  sterilised: z.enum(['yes', 'no']).optional(),
+  fiv: z.enum(['positive', 'negative', 'not_tested', '']).optional(),
+  felv: z.enum(['positive', 'negative', 'not_tested', '']).optional(),
+  sterilised: z.enum(['yes', 'no', '']).optional(),
   patronName: z.string().optional(),
   patronSince: z.string().optional(),
   patronOrigin: z.string().optional(),
@@ -31,6 +33,9 @@ const schema = z.object({
   adoptionNotes: z.string().optional(),
   driveUrl: z.string().optional(),
   notes: z.string().optional(),
+  promotionWebsite: z.enum(['yes', 'no', '']).optional(),
+  promotionGladpet: z.string().optional(),
+  promotionHappyPaw: z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -42,6 +47,10 @@ interface CatFormProps {
 }
 
 export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProps) {
+  const [extraLinks, setExtraLinks] = useState<PromotionLink[]>(
+    initialData?.promotion?.extraLinks ?? [],
+  );
+
   const {
     register,
     handleSubmit,
@@ -77,6 +86,9 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           adoptionNotes: initialData.adoptionNotes ?? '',
           driveUrl: initialData.driveUrl ?? '',
           notes: initialData.notes ?? '',
+          promotionWebsite: initialData.promotion?.website === true ? 'yes' : initialData.promotion?.website === false ? 'no' : '',
+          promotionGladpet: initialData.promotion?.gladpet ?? '',
+          promotionHappyPaw: initialData.promotion?.happyPaw ?? '',
         }
       : { sex: 'female' },
   });
@@ -84,11 +96,11 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
   const onFormSubmit = (data: FormData) => {
     onSubmit({
       name: data.name,
-      breed: data.breed,
-      birthDate: data.birthDate,
-      sex: data.sex,
-      color: data.color,
-      photoUrl: data.photoUrl || undefined,
+      breed: data.breed || '',
+      birthDate: data.birthDate || '',
+      sex: (data.sex ?? 'female') as 'male' | 'female',
+      color: data.color || '',
+      photoUrl: data.photoUrl ?? '',
       arrivalDate: data.arrivalDate || undefined,
       location: data.location as CatLocation | undefined,
       origin: data.origin || undefined,
@@ -98,12 +110,22 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       sterilised: data.sterilised === 'yes' ? true : data.sterilised === 'no' ? false : undefined,
       patron: data.patronName
         ? ({ name: data.patronName, since: data.patronSince ?? '', origin: data.patronOrigin ?? '', instagram: data.patronInstagram || undefined, phone: data.patronPhone || undefined } as Patron)
-        : undefined,
+        : null,
       adoption: data.adoptionDate || data.adoptionFrom
         ? ({ date: data.adoptionDate ?? '', from: data.adoptionFrom ?? '', email: data.adoptionEmail || undefined, phone1: data.adoptionPhone1 || undefined, phone2: data.adoptionPhone2 || undefined, instagram: data.adoptionInstagram || undefined } as Adoption)
-        : undefined,
+        : null,
       adoptionNotes: data.adoptionNotes || undefined,
-      driveUrl: data.driveUrl || undefined,
+      promotion: data.promotionWebsite || data.promotionGladpet || data.promotionHappyPaw || extraLinks.length > 0
+        ? {
+            website: data.promotionWebsite === 'yes',
+            gladpet: data.promotionGladpet || undefined,
+            happyPaw: data.promotionHappyPaw || undefined,
+            extraLinks: extraLinks.filter((l) => l.name && l.url).length > 0
+              ? extraLinks.filter((l) => l.name && l.url)
+              : undefined,
+          } as Promotion
+        : null,
+      driveUrl: data.driveUrl ?? '',
       notes: data.notes || undefined,
     });
   };
@@ -117,7 +139,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
           {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
         </div>
         <div>
-          <label className="label">Стать *</label>
+          <label className="label">Стать</label>
           <select {...register('sex')} className="input">
             <option value="female">Киця ♀</option>
             <option value="male">Кіт ♂</option>
@@ -126,21 +148,18 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       </div>
 
       <div>
-        <label className="label">Порода *</label>
+        <label className="label">Порода</label>
         <input {...register('breed')} className="input" placeholder="Мейн-кун, Британська короткошерста..." />
-        {errors.breed && <p className="text-xs text-red-500 mt-1">{errors.breed.message}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="label">Дата народження *</label>
+          <label className="label">Дата народження</label>
           <input type="date" {...register('birthDate')} className="input" />
-          {errors.birthDate && <p className="text-xs text-red-500 mt-1">{errors.birthDate.message}</p>}
         </div>
         <div>
-          <label className="label">Колір *</label>
+          <label className="label">Колір</label>
           <input {...register('color')} className="input" placeholder="Таббі, чорно-білий..." />
-          {errors.color && <p className="text-xs text-red-500 mt-1">{errors.color.message}</p>}
         </div>
       </div>
 
@@ -154,7 +173,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       </div>
 
       <div>
-        <label className="label">Google Drive папка</label>
+        <label className="label">Папка із фото</label>
         <input
           {...register('driveUrl')}
           className="input"
@@ -197,17 +216,19 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
         <div>
           <label className="label">FIV</label>
           <select {...register('fiv')} className="input">
-            <option value="">— не тестувався —</option>
+            <option value="">— не вказано —</option>
             <option value="negative">Негативний</option>
             <option value="positive">Позитивний</option>
+            <option value="not_tested">Не тестували</option>
           </select>
         </div>
         <div>
           <label className="label">FeLV</label>
           <select {...register('felv')} className="input">
-            <option value="">— не тестувався —</option>
+            <option value="">— не вказано —</option>
             <option value="negative">Негативний</option>
             <option value="positive">Позитивний</option>
+            <option value="not_tested">Не тестували</option>
           </select>
         </div>
       </div>
@@ -320,6 +341,87 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
             <label className="label">Instagram</label>
             <input {...register('adoptionInstagram')} className="input" placeholder="@username" />
           </div>
+        </div>
+      </div>
+
+      {/* Promotion section */}
+      <div className="border-t border-gray-100 pt-4">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Публікації на сайтах</p>
+        <div className="space-y-3">
+          <div>
+            <label className="label">Сайт притулку</label>
+            <select {...register('promotionWebsite')} className="input">
+              <option value="">— не вказано —</option>
+              <option value="yes">Так</option>
+              <option value="no">Ні</option>
+            </select>
+          </div>
+          <div>
+            <label className="label">GladPet</label>
+            <input
+              {...register('promotionGladpet')}
+              className="input"
+              placeholder="https://gladpet.com/..."
+              type="url"
+            />
+          </div>
+          <div>
+            <label className="label">Happy Paw</label>
+            <input
+              {...register('promotionHappyPaw')}
+              className="input"
+              placeholder="https://happypaw.ua/..."
+              type="url"
+            />
+          </div>
+
+          {extraLinks.map((link, idx) => (
+            <div key={idx} className="flex gap-2 items-end">
+              <div className="flex-1">
+                <label className="label">Назва</label>
+                <input
+                  value={link.name}
+                  onChange={(e) => {
+                    const updated = [...extraLinks];
+                    updated[idx] = { ...updated[idx], name: e.target.value };
+                    setExtraLinks(updated);
+                  }}
+                  className="input"
+                  placeholder="Назва сайту"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="label">Посилання</label>
+                <input
+                  value={link.url}
+                  onChange={(e) => {
+                    const updated = [...extraLinks];
+                    updated[idx] = { ...updated[idx], url: e.target.value };
+                    setExtraLinks(updated);
+                  }}
+                  className="input"
+                  placeholder="https://..."
+                  type="url"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setExtraLinks(extraLinks.filter((_, i) => i !== idx))}
+                className="p-2 text-red-400 hover:text-red-600 transition"
+                title="Видалити"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={() => setExtraLinks([...extraLinks, { name: '', url: '' }])}
+            className="flex items-center gap-1.5 text-sm text-teal-600 hover:text-teal-700 transition"
+          >
+            <Plus size={14} /> Додати посилання
+          </button>
         </div>
       </div>
 

@@ -3,7 +3,20 @@ import { Cat } from '../../types';
 import { useRecordsStore } from '../../store/recordsStore';
 import { formatAge, isOverdue, isDueSoon } from '../../utils/dateUtils';
 import CatAvatar from './CatAvatar';
-import { Calendar, Syringe, Stethoscope } from 'lucide-react';
+import { Calendar, Syringe, Stethoscope, Bug } from 'lucide-react';
+
+function isThisWeek(dateStr: string): boolean {
+  const date = new Date(dateStr + 'T00:00:00');
+  const now = new Date();
+  const day = now.getDay();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+  startOfWeek.setHours(0, 0, 0, 0);
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+  return date >= startOfWeek && date <= endOfWeek;
+}
 
 interface CatCardProps {
   cat: Cat;
@@ -16,36 +29,57 @@ export default function CatCard({ cat }: CatCardProps) {
   const appointments = records.filter((r) => r.type === 'appointment' && r.status === 'scheduled').length;
 
   // Show vaccination badge only if any vaccination has a nextDueDate that is overdue or within 7 days
-  const urgentVaccination = records.some(
-    (r) => r.type === 'vaccination' && r.nextDueDate && (isOverdue(r.nextDueDate) || isDueSoon(r.nextDueDate, 7))
-  );
+  const urgentVaccination = records.filter(
+    (r) => r.type === 'vaccination' && r.status === 'scheduled' && (isOverdue(r.date) || isDueSoon(r.date, 7))
+  ).length;
+
+  const treatmentThisWeek = records.filter(
+    (r) => r.type === 'treatment' && r.status === 'scheduled' && isThisWeek(r.date)
+  ).length;
 
   return (
     <Link to={`/cats/${cat.id}`} className="card block hover:shadow-md transition-shadow duration-200">
-      <div className="p-5">
+      <div className="p-5 relative">
+        {(cat.fiv === 'positive' || cat.felv === 'positive') && (
+          <div className="absolute top-3 right-3 flex gap-1">
+            {cat.fiv === 'positive' && (
+              <span className="px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">FIV</span>
+            )}
+            {cat.felv === 'positive' && (
+              <span className="px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">FeLV</span>
+            )}
+          </div>
+        )}
         <div className="flex items-start gap-4">
           <CatAvatar cat={cat} size="lg" />
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-800 text-lg truncate">{cat.name}</h3>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-gray-400">{formatAge(cat.birthDate)}</span>
-              <span className="w-1 h-1 rounded-full bg-gray-300" />
-              <span className="text-xs text-gray-400 capitalize">{cat.sex === 'male' ? '♂' : '♀'} {cat.color}</span>
+            <h3 className="font-semibold text-gray-800 text-lg truncate">
+              {cat.name} <span className="text-gray-400">{cat.sex === 'male' ? '♂' : '♀'}</span>
+            </h3>
+            <div className="flex flex-col mt-1">
+              {cat.birthDate && <span className="text-xs text-gray-400">{formatAge(cat.birthDate)}</span>}
+              {cat.color && <span className="text-xs text-gray-400">{cat.color}</span>}
             </div>
           </div>
         </div>
 
-        <div className="mt-4 flex items-center gap-4 border-t border-gray-50 pt-3">
+        <div className="mt-4 flex items-center gap-3 flex-wrap border-t border-gray-50 pt-3">
           {procedures > 0 && (
             <div className="flex items-center gap-1.5 text-xs text-gray-500">
               <Stethoscope size={13} className="text-blue-400" />
               <span>{procedures}</span>
             </div>
           )}
-          {urgentVaccination && (
-            <div className="flex items-center gap-1.5 text-xs text-amber-600">
-              <Syringe size={13} className="text-amber-500" />
-              <span>Вакцина</span>
+          {treatmentThisWeek > 0 && (
+            <div className="flex items-center gap-1.5 text-xs text-blue-600">
+              <Bug size={13} className="text-blue-500" />
+              <span>{treatmentThisWeek}</span>
+            </div>
+          )}
+          {urgentVaccination > 0 && (
+            <div className="flex items-center gap-1.5 text-xs text-green-600">
+              <Syringe size={13} className="text-green-500" />
+              <span>{urgentVaccination}</span>
             </div>
           )}
           {appointments > 0 && (
