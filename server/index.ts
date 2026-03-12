@@ -2,13 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
+import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, 'data');
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
+app.use(cookieParser());
 app.use(express.json());
 
 // Ensure data directory exists
@@ -30,6 +33,44 @@ function readData(name: string): unknown[] {
 
 function writeData(name: string, data: unknown[]): void {
   fs.writeFileSync(dataFile(name), JSON.stringify(data, null, 2), 'utf-8');
+}
+
+// ── Token store ────────────────────────────────────────────────────────────
+interface TokenRecord {
+  token: string;
+  userId: string;
+  userName: string;
+  role: string;
+  createdAt: string;
+}
+
+function readTokens(): TokenRecord[] {
+  const file = dataFile('tokens');
+  if (!fs.existsSync(file)) return [];
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf-8'));
+  } catch {
+    return [];
+  }
+}
+
+function writeTokens(tokens: TokenRecord[]): void {
+  fs.writeFileSync(dataFile('tokens'), JSON.stringify(tokens, null, 2), 'utf-8');
+}
+
+function findByToken(token: string): TokenRecord | undefined {
+  return readTokens().find((t) => t.token === token);
+}
+
+const COOKIE_NAME = 'kotonosiki_auth';
+
+function getTokenFromReq(req: express.Request): string | null {
+  // Try cookie first, then Authorization header as fallback
+  const fromCookie = req.cookies?.[COOKIE_NAME];
+  if (fromCookie) return fromCookie;
+  const auth = req.headers['authorization'];
+  if (auth?.startsWith('Bearer ')) return auth.slice(7);
+  return null;
 }
 
 // ── Logging ────────────────────────────────────────────────────────────────
@@ -54,14 +95,10 @@ interface LogEntry {
 }
 
 function getSessionFromReq(req: express.Request): { userId: string; name: string } | null {
-  const header = req.headers['x-session'];
-  if (!header || typeof header !== 'string') return null;
-  try {
-    const s = JSON.parse(header);
-    return s?.userId ? { userId: s.userId, name: s.name ?? s.userId } : null;
-  } catch {
-    return null;
-  }
+  const token = getTokenFromReq(req);
+  if (!token) return null;
+  const rec = findByToken(token);
+  return rec ? { userId: rec.userId, name: rec.userName } : null;
 }
 
 // Fields to skip in diffs (noisy / not human-readable)
@@ -225,9 +262,67 @@ app.get('/api/logs', (_req, res) => {
   res.json(readData('logs'));
 });
 
-// ── Session stubs (auth is now per-browser via localStorage) ───────────────
-// These exist only so that old cached client code doesn't break.
-// They always return null / no-op — no shared server-side session.
+// ── Auth endpoints ─────────────────────────────────────────────────────────
+app.post('/api/login', (req, res) => {
+  const { login, password } = req.body as { login?: string; password?: string };
+  if (!login || !password) return res.status(400).json({ error: 'Login and password required' });
+
+  const users = readData('users') as Record<string, unknown>[];
+  const user = users.find(
+    (u) => u.login === login && u.passwordHash === btoa(password)
+  );
+  if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+
+  const token = crypto.randomBytes(32).toString('hex');
+  const rec: TokenRecord = {
+    token,
+    userId: user.id as string,
+    userName: (user.name as string) ?? login,
+    role: user.role as string,
+    createdAt: new Date().toISOString(),
+  };
+
+  const tokens = readTokens();
+  tokens.push(rec);
+  writeTokens(tokens);
+
+  // Set HTTP-only cookie — the browser will send it automatically
+  res.cookie(COOKIE_NAME, token, {
+    httpOnly: true,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+  });
+
+  res.json({
+    userId: rec.userId,
+    name: rec.userName,
+    role: rec.role,
+  });
+});
+
+app.post('/api/logout', (req, res) => {
+  const token = getTokenFromReq(req);
+  if (token) {
+    const tokens = readTokens().filter((t) => t.token !== token);
+    writeTokens(tokens);
+  }
+  res.clearCookie(COOKIE_NAME, { path: '/' });
+  res.json({ ok: true });
+});
+
+app.get('/api/me', (req, res) => {
+  const token = getTokenFromReq(req);
+  if (!token) return res.status(401).json({ error: 'Not authenticated' });
+  const rec = findByToken(token);
+  if (!rec) {
+    res.clearCookie(COOKIE_NAME, { path: '/' });
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+  res.json({ userId: rec.userId, name: rec.userName, role: rec.role });
+});
+
+// ── Legacy session stubs (for any old cached client code) ──────────────────
 app.get('/api/session', (_req, res) => { res.json(null); });
 app.post('/api/session', (_req, res) => { res.json(null); });
 app.delete('/api/session', (_req, res) => { res.json({ ok: true }); });

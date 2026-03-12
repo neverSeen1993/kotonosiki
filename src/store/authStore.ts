@@ -1,27 +1,5 @@
 import { create } from 'zustand';
-import { AuthSession, User, UserRole } from '../types';
-import { api } from '../utils/api';
-
-const SESSION_KEY = 'kotonosiki_session';
-
-function loadLocalSession(): AuthSession | null {
-  try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    if (!raw) return null;
-    const s = JSON.parse(raw) as AuthSession;
-    return s?.userId ? s : null;
-  } catch {
-    return null;
-  }
-}
-
-function saveLocalSession(session: AuthSession | null) {
-  if (session) {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-  } else {
-    localStorage.removeItem(SESSION_KEY);
-  }
-}
+import { AuthSession, UserRole } from '../types';
 
 interface AuthState {
   session: AuthSession | null;
@@ -38,24 +16,51 @@ export const useAuthStore = create<AuthState>((set) => ({
   role: null,
 
   init: async () => {
-    const session = loadLocalSession();
-    if (session?.userId) {
-      set({ session, isAuthenticated: true, role: session.role });
+    try {
+      const res = await fetch('/api/me', { credentials: 'include' });
+      if (!res.ok) return; // not logged in — cookie missing or invalid
+      const data = await res.json();
+      const session: AuthSession = {
+        userId: data.userId,
+        role: data.role,
+        name: data.name,
+      };
+      set({ session, isAuthenticated: true, role: data.role });
+    } catch {
+      // server unreachable
     }
   },
 
   login: async (login, password) => {
-    const users = await api.get<User[]>('/users');
-    const user = users.find((u) => u.login === login && u.passwordHash === btoa(password));
-    if (!user) return false;
-    const session: AuthSession = { userId: user.id, role: user.role, name: user.name };
-    saveLocalSession(session);
-    set({ session, isAuthenticated: true, role: user.role });
-    return true;
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ login, password }),
+      });
+      if (!res.ok) return false;
+
+      const data = await res.json();
+      const session: AuthSession = {
+        userId: data.userId,
+        role: data.role,
+        name: data.name,
+      };
+      set({ session, isAuthenticated: true, role: data.role });
+      return true;
+    } catch {
+      return false;
+    }
   },
 
   logout: async () => {
-    saveLocalSession(null);
+    try {
+      await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch { /* ignore */ }
     set({ session: null, isAuthenticated: false, role: null });
   },
 }));

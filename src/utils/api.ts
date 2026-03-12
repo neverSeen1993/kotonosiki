@@ -1,15 +1,7 @@
 const BASE = '/api';
 
-function sessionHeaders(): Record<string, string> {
-  try {
-    const raw = localStorage.getItem('kotonosiki_session');
-    if (raw) return { 'x-session': raw };
-  } catch { /* noop */ }
-  return {};
-}
-
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, { headers: sessionHeaders() });
+  const res = await fetch(`${BASE}${path}`, { credentials: 'include' });
   if (!res.ok) throw new Error(`GET ${path} failed: ${res.status}`);
   return res.json();
 }
@@ -17,7 +9,8 @@ async function get<T>(path: string): Promise<T> {
 async function post<T>(path: string, body: T): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...sessionHeaders() },
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`POST ${path} failed: ${res.status}`);
@@ -27,7 +20,8 @@ async function post<T>(path: string, body: T): Promise<T> {
 async function put<T>(path: string, body: Partial<T>): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...sessionHeaders() },
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`PUT ${path} failed: ${res.status}`);
@@ -35,7 +29,7 @@ async function put<T>(path: string, body: Partial<T>): Promise<T> {
 }
 
 async function del(path: string): Promise<void> {
-  const res = await fetch(`${BASE}${path}`, { method: 'DELETE', headers: sessionHeaders() });
+  const res = await fetch(`${BASE}${path}`, { method: 'DELETE', credentials: 'include' });
   if (!res.ok) throw new Error(`DELETE ${path} failed: ${res.status}`);
 }
 
