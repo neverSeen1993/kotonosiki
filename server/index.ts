@@ -225,6 +225,19 @@ app.get('/api/logs', (_req, res) => {
   res.json(readData('logs'));
 });
 
+// ── Session stubs (auth is now per-browser via localStorage) ───────────────
+// These exist only so that old cached client code doesn't break.
+// They always return null / no-op — no shared server-side session.
+app.get('/api/session', (_req, res) => { res.json(null); });
+app.post('/api/session', (_req, res) => { res.json(null); });
+app.delete('/api/session', (_req, res) => { res.json({ ok: true }); });
+
+// Clean up old session file if it exists
+const oldSessionFile = dataFile('session');
+if (fs.existsSync(oldSessionFile)) {
+  try { fs.unlinkSync(oldSessionFile); } catch { /* ignore */ }
+}
+
 // ── Serve frontend in production ───────────────────────────────────────────
 const DIST_DIR = path.join(__dirname, '..', 'dist');
 if (fs.existsSync(DIST_DIR)) {
