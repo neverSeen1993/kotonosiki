@@ -26,3 +26,7 @@ Thumbs.db
 *.log
 npm-debug.log*
 
+# Server data (each environment has its own DB)
+server/data/*.json
+!server/data/users.json
+
