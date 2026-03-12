@@ -16,6 +16,7 @@
     "promotion": {
       "website": false,
       "gladpet": "https://gladpet.org/pet/18705"
-    }
+    },
+    "notes": "test"
   }
 ]

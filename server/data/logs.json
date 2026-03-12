@@ -1,5 +1,22 @@
 [
   {
+    "id": "1773350232233-ggy59",
+    "timestamp": "2026-03-12T21:17:12.233Z",
+    "userId": "user-admin",
+    "userName": "ÐÐ´Ð¼ÑÐ½ÑÑÑÑÐ°ÑÐ¾Ñ",
+    "action": "update",
+    "collection": "cats",
+    "entityId": "ddded31d-320a-4c39-b732-97fc614bef6a",
+    "details": "Кіт оновлено: Мурчелло",
+    "changes": [
+      {
+        "field": "notes",
+        "before": null,
+        "after": "test"
+      }
+    ]
+  },
+  {
     "id": "1773263084474-0eulu",
     "timestamp": "2026-03-11T21:04:44.474Z",
     "userId": "user-admin",

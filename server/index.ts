@@ -53,11 +53,11 @@ interface LogEntry {
   snapshot?: Record<string, unknown>; // full object for create/delete
 }
 
-function getSession(): { userId: string; name: string } | null {
-  const file = dataFile('session');
-  if (!fs.existsSync(file)) return null;
+function getSessionFromReq(req: express.Request): { userId: string; name: string } | null {
+  const header = req.headers['x-session'];
+  if (!header || typeof header !== 'string') return null;
   try {
-    const s = JSON.parse(fs.readFileSync(file, 'utf-8'));
+    const s = JSON.parse(header);
     return s?.userId ? { userId: s.userId, name: s.name ?? s.userId } : null;
   } catch {
     return null;
@@ -79,13 +79,14 @@ function buildDiff(before: Record<string, unknown>, patch: Record<string, unknow
 }
 
 function writeLog(
+  req: express.Request,
   action: LogEntry['action'],
   collection: string,
   entityId: string | undefined,
   details: string,
   extra: { changes?: FieldChange[]; snapshot?: Record<string, unknown> } = {}
 ) {
-  const session = getSession();
+  const session = getSessionFromReq(req);
   const entry: LogEntry = {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     timestamp: new Date().toISOString(),
@@ -126,7 +127,7 @@ for (const col of collections) {
     writeData(col, items);
     const label = collectionName[col] ?? col;
     const name = (item.name as string) || (item.title as string) || String(item.id ?? '');
-    writeLog('create', col, item.id as string, `${label} створено: ${name}`, { snapshot: item });
+    writeLog(req, 'create', col, item.id as string, `${label} створено: ${name}`, { snapshot: item });
     res.json(item);
   });
 
@@ -145,7 +146,7 @@ for (const col of collections) {
     const label = collectionName[col] ?? col;
     const name = (merged.name as string) || (merged.title as string) || String(merged.id ?? '');
     const changes = buildDiff(before, req.body as Record<string, unknown>);
-    writeLog('update', col, req.params.id, `${label} оновлено: ${name}`, { changes });
+    writeLog(req, 'update', col, req.params.id, `${label} оновлено: ${name}`, { changes });
     res.json(items[idx]);
   });
 
@@ -157,32 +158,10 @@ for (const col of collections) {
     writeData(col, filtered);
     const label = collectionName[col] ?? col;
     const name = item ? ((item.name as string) || (item.title as string) || req.params.id) : req.params.id;
-    writeLog('delete', col, req.params.id, `${label} видалено: ${name}`, { snapshot: item });
+    writeLog(req, 'delete', col, req.params.id, `${label} видалено: ${name}`, { snapshot: item });
     res.json({ ok: true });
   });
 }
-
-// Session endpoints (single object, not array)
-app.get('/api/session', (_req, res) => {
-  const file = dataFile('session');
-  if (!fs.existsSync(file)) return res.json(null);
-  try {
-    res.json(JSON.parse(fs.readFileSync(file, 'utf-8')));
-  } catch {
-    res.json(null);
-  }
-});
-
-app.post('/api/session', (req, res) => {
-  fs.writeFileSync(dataFile('session'), JSON.stringify(req.body, null, 2));
-  res.json(req.body);
-});
-
-app.delete('/api/session', (_req, res) => {
-  const file = dataFile('session');
-  if (fs.existsSync(file)) fs.unlinkSync(file);
-  res.json({ ok: true });
-});
 
 // Bulk migration endpoint — imports data from localStorage export, skips duplicates
 app.post('/api/migrate', (req, res) => {
