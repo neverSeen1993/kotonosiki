@@ -105,7 +105,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
+    <div className="min-h-screen flex flex-col md:flex-row overflow-x-hidden">
       {/* Sidebar — desktop only, unchanged */}
       <aside className="hidden md:flex md:flex-col md:w-56 bg-white border-r border-gray-100 px-3 py-6 flex-shrink-0 sticky top-0 h-screen overflow-y-auto">
         <Link to="/" className="flex items-center gap-2 px-3 mb-8">
@@ -289,8 +289,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Main */}
-      <main className="flex-1 flex flex-col">
-        <div className="flex-1 p-4 md:p-8 max-w-5xl w-full mx-auto">{children}</div>
+      <main className="flex-1 flex flex-col overflow-x-hidden min-w-0">
+        <div className="flex-1 p-4 md:p-8 max-w-5xl w-full mx-auto overflow-x-hidden">{children}</div>
       </main>
     </div>
   );

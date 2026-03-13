@@ -34,10 +34,10 @@ function DiffRow({ change }: { change: FieldChange }) {
   return (
     <tr className="text-xs">
       <td className="py-1 pr-3 text-gray-400 font-mono whitespace-nowrap">{change.field}</td>
-      <td className="py-1 pr-3 text-red-500 line-through max-w-[200px] truncate" title={formatValue(change.before)}>
+      <td className="py-1 pr-3 text-red-500 line-through max-w-[120px] sm:max-w-[200px] truncate" title={formatValue(change.before)}>
         {formatValue(change.before)}
       </td>
-      <td className="py-1 text-green-600 font-medium max-w-[200px] truncate" title={formatValue(change.after)}>
+      <td className="py-1 text-green-600 font-medium max-w-[120px] sm:max-w-[200px] truncate" title={formatValue(change.after)}>
         {formatValue(change.after)}
       </td>
     </tr>
@@ -53,7 +53,7 @@ function SnapshotTable({ data }: { data: Record<string, unknown> }) {
         {entries.map(([k, v]) => (
           <tr key={k}>
             <td className="py-0.5 pr-3 text-gray-400 font-mono whitespace-nowrap">{k}</td>
-            <td className="py-0.5 text-gray-600 max-w-[300px] truncate" title={formatValue(v)}>{formatValue(v)}</td>
+            <td className="py-0.5 text-gray-600 max-w-[180px] sm:max-w-[300px] truncate" title={formatValue(v)}>{formatValue(v)}</td>
           </tr>
         ))}
       </tbody>
@@ -120,8 +120,8 @@ export default function LogPage() {
         <div className="text-center py-16 text-gray-400 text-sm">Подій не знайдено</div>
       ) : (
         <div className="card overflow-hidden divide-y divide-gray-50">
-          {/* Header */}
-          <div className="grid grid-cols-[160px_140px_130px_1fr_24px] gap-2 px-4 py-2.5 bg-gray-50 text-xs text-gray-500 uppercase tracking-wide font-medium">
+          {/* Header — desktop only */}
+          <div className="hidden md:grid grid-cols-[160px_140px_130px_1fr_24px] gap-2 px-4 py-2.5 bg-gray-50 text-xs text-gray-500 uppercase tracking-wide font-medium">
             <span>Час</span>
             <span>Користувач</span>
             <span>Дія</span>
@@ -134,9 +134,9 @@ export default function LogPage() {
             const canExpand = hasDetail(log);
             return (
               <div key={log.id}>
-                {/* Main row */}
+                {/* Main row — desktop */}
                 <div
-                  className={`grid grid-cols-[160px_140px_130px_1fr_24px] gap-2 px-4 py-2.5 items-start ${canExpand ? 'cursor-pointer hover:bg-gray-50' : ''} transition`}
+                  className={`hidden md:grid grid-cols-[160px_140px_130px_1fr_24px] gap-2 px-4 py-2.5 items-start ${canExpand ? 'cursor-pointer hover:bg-gray-50' : ''} transition`}
                   onClick={() => canExpand && setExpanded(isOpen ? null : log.id)}
                 >
                   <span className="text-xs text-gray-400 whitespace-nowrap pt-0.5">
@@ -159,9 +159,34 @@ export default function LogPage() {
                   </span>
                 </div>
 
+                {/* Main row — mobile (card-style) */}
+                <div
+                  className={`md:hidden px-3 py-3 ${canExpand ? 'cursor-pointer active:bg-gray-50' : ''} transition`}
+                  onClick={() => canExpand && setExpanded(isOpen ? null : log.id)}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${actionChip[log.action]}`}>
+                      {actionIcon[log.action]}
+                      {actionLabel[log.action]}
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] text-gray-400 whitespace-nowrap">
+                        {format(parseISO(log.timestamp), 'd MMM, HH:mm', { locale: uk })}
+                      </span>
+                      {canExpand && (
+                        isOpen
+                          ? <ChevronUp size={12} className="text-gray-400" />
+                          : <ChevronDown size={12} className="text-gray-400" />
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-600 leading-snug break-words">{log.details}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{log.userName}</p>
+                </div>
+
                 {/* Expanded diff */}
                 {isOpen && (
-                  <div className="px-4 pb-3 bg-gray-50 border-t border-gray-100">
+                  <div className="px-3 sm:px-4 pb-3 bg-gray-50 border-t border-gray-100 overflow-x-auto">
                     {log.action === 'update' && log.changes && log.changes.length > 0 && (
                       <div className="mt-2">
                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Зміни</p>

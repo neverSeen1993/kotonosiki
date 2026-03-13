@@ -88,8 +88,8 @@ export default function CatProfilePage() {
 
       {/* Hero */}
       <div className="card mb-6">
-        <div className="p-6">
-          <div className="flex items-start gap-5">
+        <div className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
             <CatAvatar cat={cat} size="xl" />
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">

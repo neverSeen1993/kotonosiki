@@ -3,8 +3,9 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply bg-cream-50 text-gray-800 font-sans;
+  html, body {
+    @apply bg-cream-50 text-gray-800 font-sans overflow-x-hidden;
+    -webkit-overflow-scrolling: touch;
   }
 }
 

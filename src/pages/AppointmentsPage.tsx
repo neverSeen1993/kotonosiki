@@ -60,7 +60,7 @@ export default function AppointmentsPage() {
             return (
               <div
                 key={record.id}
-                className={`card flex items-center gap-4 px-4 py-3 ${
+                className={`card flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-3 ${
                   isOverdue(record.date) ? 'border-red-200 bg-red-50/50' : isDueToday(record.date) ? 'border-amber-200 bg-amber-50/50' : ''
                 }`}
               >
@@ -79,7 +79,7 @@ export default function AppointmentsPage() {
                     </Link>
                   )}
                 </div>
-                <div className="text-right">
+                <div className="text-right shrink-0">
                   <p className="text-xs text-gray-500">
                     {formatDate(record.date)}
                     {record.scheduledTime && <span className="ml-1.5 font-medium text-gray-600">{record.scheduledTime}</span>}

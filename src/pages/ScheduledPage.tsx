@@ -77,11 +77,11 @@ export default function ScheduledPage() {
       </>
     );
     return cat ? (
-      <Link key={record.id} to={`/cats/${cat.id}`} className="card flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition">
+      <Link key={record.id} to={`/cats/${cat.id}`} className="card flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-3 hover:bg-gray-50 transition">
         {cardContent}
       </Link>
     ) : (
-      <div key={record.id} className="card flex items-center gap-4 px-4 py-3">{cardContent}</div>
+      <div key={record.id} className="card flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-3">{cardContent}</div>
     );
   };
 
@@ -101,9 +101,9 @@ export default function ScheduledPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Заплановані маніпуляції</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="min-w-0">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800">Заплановані маніпуляції</h1>
           <p className="text-sm text-gray-400 mt-0.5">{all.length} запис{all.length === 1 ? '' : 'ів'}</p>
         </div>
         <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
@@ -174,7 +174,7 @@ export default function ScheduledPage() {
           {/* Day headers */}
           <div className="grid grid-cols-7 border-b border-gray-100">
             {WEEK_DAYS.map((d) => (
-              <div key={d} className="text-center text-xs font-medium text-gray-400 py-2">{d}</div>
+              <div key={d} className="text-center text-[10px] md:text-xs font-medium text-gray-400 py-2">{d}</div>
             ))}
           </div>
 
@@ -186,8 +186,8 @@ export default function ScheduledPage() {
               const inMonth = isSameMonth(day, calMonth);
               const todayDay = isToday(day);
               return (
-                <div key={key} className={`min-h-[80px] p-1.5 ${inMonth ? 'bg-white' : 'bg-gray-50'}`}>
-                  <div className={`text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full mb-1 ${
+                <div key={key} className={`min-h-[60px] md:min-h-[80px] p-1 md:p-1.5 ${inMonth ? 'bg-white' : 'bg-gray-50'}`}>
+                  <div className={`text-[10px] md:text-xs font-medium w-5 h-5 md:w-6 md:h-6 flex items-center justify-center rounded-full mb-0.5 md:mb-1 ${
                     todayDay ? 'bg-teal-500 text-white' : inMonth ? 'text-gray-700' : 'text-gray-300'
                   }`}>
                     {format(day, 'd')}

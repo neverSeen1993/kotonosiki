@@ -138,7 +138,7 @@ export default function RecordList({ catId, type, catBirthDate }: RecordListProp
             return (
               <div key={record.id} className="card">
                 <div
-                  className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition"
+                  className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 cursor-pointer hover:bg-gray-50 transition"
                   onClick={() => setExpanded(isOpen ? null : record.id)}
                 >
                   <div className="flex-1 min-w-0">

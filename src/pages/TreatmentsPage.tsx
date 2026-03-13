@@ -71,12 +71,12 @@ export default function TreatmentsPage() {
       <Link
         key={record.id}
         to={`/cats/${cat.id}`}
-        className="card flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition"
+        className="card flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-3 hover:bg-gray-50 transition"
       >
         {cardContent}
       </Link>
     ) : (
-      <div key={record.id} className="card flex items-center gap-4 px-4 py-3">
+      <div key={record.id} className="card flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-3">
         {cardContent}
       </div>
     );
