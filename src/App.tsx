@@ -9,6 +9,8 @@ import TreatmentsPage from './pages/TreatmentsPage';
 import ScheduledPage from './pages/ScheduledPage';
 import LogPage from './pages/LogPage';
 import AdoptedPage from './pages/AdoptedPage';
+import VisitsPage from './pages/VisitsPage';
+import ShiftsPage from './pages/ShiftsPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
@@ -27,6 +29,8 @@ export default function App() {
                 <Route path="/treatments" element={<TreatmentsPage />} />
                 <Route path="/scheduled" element={<ScheduledPage />} />
                 <Route path="/adopted" element={<AdoptedPage />} />
+                <Route path="/visits" element={<VisitsPage />} />
+                <Route path="/shifts" element={<ShiftsPage />} />
                 <Route path="/log" element={<LogPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

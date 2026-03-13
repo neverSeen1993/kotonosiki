@@ -88,7 +88,7 @@ export default function LogPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Журнал змін</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Історія</h1>
           <p className="text-sm text-gray-400 mt-0.5">{filtered.length} подій</p>
         </div>
         <button

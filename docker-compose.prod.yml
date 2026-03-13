@@ -1,0 +1,17 @@
+# Production compose — builds optimized image, serves static + API
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:3001"
+    volumes:
+      - kotonosiki-data:/app/server/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    restart: unless-stopped
+
+volumes:
+  kotonosiki-data:

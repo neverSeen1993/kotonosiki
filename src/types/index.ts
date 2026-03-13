@@ -107,6 +107,32 @@ export interface AuthSession {
   name: string;
 }
 
+export interface Visit {
+  id: string;
+  title: string;
+  date: string;          // ISO date
+  time?: string;         // HH:MM
+  description?: string;
+  visitor?: string;      // who is visiting
+  phone?: string;
+  catId?: string;        // optional link to a cat
+  status: 'planned' | 'done' | 'cancelled';
+  notes?: string;
+  createdAt: string;
+}
+
+export type ShiftType = 'half' | 'full';
+
+export interface Shift {
+  id: string;
+  nannyName: string;      // котоняня name
+  date: string;            // ISO date
+  type: ShiftType;         // half = 4h, full = 8h
+  extraHours?: number;     // additional hours on top
+  notes?: string;
+  createdAt: string;
+}
+
 export interface FieldChange {
   field: string;
   before: unknown;

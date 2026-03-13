@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useCatsStore } from '../store/catsStore';
 import { useRecordsStore } from '../store/recordsStore';
 import { useWeightStore } from '../store/weightStore';
+import { useVisitStore } from '../store/visitStore';
+import { useShiftStore } from '../store/shiftStore';
 import { useAuthStore } from '../store/authStore';
 import { migrateFromLocalStorage } from '../utils/migrate';
 
@@ -11,12 +13,14 @@ export default function DataLoader({ children }: { children: React.ReactNode }) 
   const { loadCats } = useCatsStore();
   const { loadRecords } = useRecordsStore();
   const { loadWeights } = useWeightStore();
+  const { loadVisits } = useVisitStore();
+  const { loadShifts } = useShiftStore();
   const { init } = useAuthStore();
 
   useEffect(() => {
     Promise.resolve()
       .then(() => migrateFromLocalStorage())
-      .then(() => Promise.all([init(), loadCats(), loadRecords(), loadWeights()]))
+      .then(() => Promise.all([init(), loadCats(), loadRecords(), loadWeights(), loadVisits(), loadShifts()]))
       .then(() => setReady(true))
       .catch(() => setError(true));
   }, []);

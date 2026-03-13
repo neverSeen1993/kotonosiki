@@ -145,10 +145,12 @@ const collectionName: Record<string, string> = {
   records: 'Запис',
   weights: 'Вага',
   users: 'Користувач',
+  visits: 'Відвідування',
+  shifts: 'Зміна',
 };
 
 // Generic CRUD routes for each collection
-const collections = ['cats', 'records', 'weights', 'users'];
+const collections = ['cats', 'records', 'weights', 'users', 'visits', 'shifts'];
 
 for (const col of collections) {
   // GET all

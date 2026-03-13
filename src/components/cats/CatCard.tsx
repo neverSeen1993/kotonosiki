@@ -39,55 +39,55 @@ export default function CatCard({ cat }: CatCardProps) {
 
   return (
     <Link to={`/cats/${cat.id}`} className="card block hover:shadow-md transition-shadow duration-200">
-      <div className="p-5 relative">
+      <div className="px-3 py-3 relative">
         {(cat.fiv === 'positive' || cat.felv === 'positive') && (
-          <div className="absolute top-3 right-3 flex gap-1">
+          <div className="absolute top-2 right-2 flex gap-1">
             {cat.fiv === 'positive' && (
-              <span className="px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">FIV</span>
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700">FIV</span>
             )}
             {cat.felv === 'positive' && (
-              <span className="px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">FeLV</span>
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700">FeLV</span>
             )}
           </div>
         )}
-        <div className="flex items-start gap-4">
-          <CatAvatar cat={cat} size="lg" />
+        <div className="flex items-center gap-3">
+          <CatAvatar cat={cat} size="md" />
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-800 text-lg truncate">
+            <h3 className="font-semibold text-gray-800 text-base truncate">
               {cat.name} <span className="text-gray-400">{cat.sex === 'male' ? '♂' : '♀'}</span>
             </h3>
-            <div className="flex flex-col mt-1">
-              {cat.birthDate && <span className="text-xs text-gray-400">{formatAge(cat.birthDate)}</span>}
-              {cat.color && <span className="text-xs text-gray-400">{cat.color}</span>}
-            </div>
-          </div>
-        </div>
+            {cat.birthDate && <p className="text-xs text-gray-400 leading-tight">{formatAge(cat.birthDate)}</p>}
+            {cat.color && <p className="text-xs text-gray-400 leading-tight">{cat.color}</p>}
 
-        <div className="mt-4 flex items-center gap-3 flex-wrap border-t border-gray-50 pt-3">
-          {procedures > 0 && (
-            <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <Stethoscope size={13} className="text-blue-400" />
-              <span>{procedures}</span>
-            </div>
-          )}
-          {treatmentThisWeek > 0 && (
-            <div className="flex items-center gap-1.5 text-xs text-blue-600">
-              <Bug size={13} className="text-blue-500" />
-              <span>{treatmentThisWeek}</span>
-            </div>
-          )}
-          {urgentVaccination > 0 && (
-            <div className="flex items-center gap-1.5 text-xs text-green-600">
-              <Syringe size={13} className="text-green-500" />
-              <span>{urgentVaccination}</span>
-            </div>
-          )}
-          {appointments > 0 && (
-            <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <Calendar size={13} className="text-purple-400" />
-              <span>{appointments}</span>
-            </div>
-          )}
+            {(procedures > 0 || treatmentThisWeek > 0 || urgentVaccination > 0 || appointments > 0) && (
+              <div className="flex items-center gap-2.5 mt-1.5">
+                {procedures > 0 && (
+                  <div className="flex items-center gap-1 text-xs text-gray-500">
+                    <Stethoscope size={12} className="text-blue-400" />
+                    <span>{procedures}</span>
+                  </div>
+                )}
+                {treatmentThisWeek > 0 && (
+                  <div className="flex items-center gap-1 text-xs text-blue-600">
+                    <Bug size={12} className="text-blue-500" />
+                    <span>{treatmentThisWeek}</span>
+                  </div>
+                )}
+                {urgentVaccination > 0 && (
+                  <div className="flex items-center gap-1 text-xs text-green-600">
+                    <Syringe size={12} className="text-green-500" />
+                    <span>{urgentVaccination}</span>
+                  </div>
+                )}
+                {appointments > 0 && (
+                  <div className="flex items-center gap-1 text-xs text-gray-500">
+                    <Calendar size={12} className="text-purple-400" />
+                    <span>{appointments}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </Link>
