@@ -228,7 +228,7 @@ export default function CatalogPage() {
 
       {canEdit && showForm && (
         <Modal title="Додати нового кота" onClose={() => setShowForm(false)}>
-          <CatForm onSubmit={handleAdd} onCancel={() => setShowForm(false)} />
+          <CatForm existingNames={cats.map((c) => c.name)} onSubmit={handleAdd} onCancel={() => setShowForm(false)} />
         </Modal>
       )}
     </div>

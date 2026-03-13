@@ -24,6 +24,11 @@ export const useCatsStore = create<CatsState>((set, get) => ({
   },
 
   addCat: async (data) => {
+    const existing = get().cats;
+    const trimmed = data.name.trim().toLowerCase();
+    if (existing.some((c) => c.name.trim().toLowerCase() === trimmed)) {
+      throw new Error(`Кіт з іменем "${data.name}" вже існує`);
+    }
     const cat: Cat = { ...data, id: uuidv4(), createdAt: new Date().toISOString() };
     await api.post('/cats', cat);
     set({ cats: [...get().cats, cat] });

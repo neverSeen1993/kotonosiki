@@ -118,8 +118,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row overflow-x-hidden">
-      {/* Sidebar — desktop only, unchanged */}
-      <aside className="hidden md:flex md:flex-col md:w-56 bg-white border-r border-gray-100 px-3 py-6 flex-shrink-0 sticky top-0 h-screen overflow-y-auto">
+      {/* Sidebar — desktop only, always visible */}
+      <aside className="hidden md:flex md:flex-col md:w-56 bg-white border-r border-gray-100 px-3 py-6 flex-shrink-0 fixed top-0 left-0 h-screen overflow-y-auto z-30">
         <Link to="/" className="flex items-center gap-2 px-3 mb-8">
           <Cat size={28} className="text-teal-500" />
           <span className="text-xl font-bold text-gray-800">Котоносики</span>
@@ -301,7 +301,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Main */}
-      <main className="flex-1 flex flex-col overflow-x-hidden min-w-0">
+      <main className="flex-1 flex flex-col overflow-x-hidden min-w-0 md:ml-56">
         <div className="flex-1 p-4 md:p-8 max-w-5xl w-full mx-auto overflow-x-hidden">{children}</div>
       </main>
     </div>

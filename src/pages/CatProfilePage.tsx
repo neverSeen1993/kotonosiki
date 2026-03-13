@@ -27,6 +27,7 @@ export default function CatProfilePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getCatById, updateCat, updateCatAdoption, deleteCat } = useCatsStore();
+  const allCats = useCatsStore((s) => s.cats);
   const { deleteRecordsByCat, getRecordsByCat, updateRecord } = useRecordsStore();
   const { deleteWeightsByCat } = useWeightStore();
   const { canEdit, canEditAdoption } = useAuth();
@@ -390,7 +391,7 @@ export default function CatProfilePage() {
 
       {canEdit && showEdit && (
         <Modal title={`Редагувати ${cat.name}`} onClose={() => setShowEdit(false)}>
-          <CatForm initialData={cat} onSubmit={handleUpdate} onCancel={() => setShowEdit(false)} />
+          <CatForm initialData={cat} existingNames={allCats.map((c) => c.name)} onSubmit={handleUpdate} onCancel={() => setShowEdit(false)} />
         </Modal>
       )}
 

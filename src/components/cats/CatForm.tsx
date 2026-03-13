@@ -42,14 +42,16 @@ type FormData = z.infer<typeof schema>;
 
 interface CatFormProps {
   initialData?: Cat;
+  existingNames?: string[];
   onSubmit: (data: Omit<Cat, 'id' | 'createdAt'>) => void;
   onCancel: () => void;
 }
 
-export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProps) {
+export default function CatForm({ initialData, existingNames = [], onSubmit, onCancel }: CatFormProps) {
   const [extraLinks, setExtraLinks] = useState<PromotionLink[]>(
     initialData?.promotion?.extraLinks ?? [],
   );
+  const [duplicateError, setDuplicateError] = useState('');
 
   const {
     register,
@@ -59,6 +61,7 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
     resolver: zodResolver(schema),
     defaultValues: initialData
       ? {
+          // ...existing code...
           name: initialData.name,
           breed: initialData.breed,
           birthDate: initialData.birthDate,
@@ -94,6 +97,13 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
   });
 
   const onFormSubmit = (data: FormData) => {
+    setDuplicateError('');
+    const trimmed = data.name.trim().toLowerCase();
+    const currentName = initialData?.name?.trim().toLowerCase();
+    if (trimmed !== currentName && existingNames.some((n) => n.trim().toLowerCase() === trimmed)) {
+      setDuplicateError(`Кіт з іменем "${data.name}" вже існує`);
+      return;
+    }
     onSubmit({
       name: data.name,
       breed: data.breed || '',
@@ -135,8 +145,9 @@ export default function CatForm({ initialData, onSubmit, onCancel }: CatFormProp
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="label">Ім'я *</label>
-          <input {...register('name')} className="input" placeholder="Луна" />
+          <input {...register('name', { onChange: () => setDuplicateError('') })} className="input" placeholder="Луна" />
           {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
+          {duplicateError && <p className="text-xs text-red-500 mt-1">{duplicateError}</p>}
         </div>
         <div>
           <label className="label">Стать</label>

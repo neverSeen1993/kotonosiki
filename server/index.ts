@@ -257,6 +257,44 @@ app.put('/api/cats/:id/adoption', requireAdminOrHelper, (req, res) => {
   res.json(items[idx]);
 });
 
+// ── Cats: unique name check on create and update ───────────────────────────
+app.post('/api/cats', requireWrite('cats'), (req, res) => {
+  const items = readData('cats') as Record<string, unknown>[];
+  const item = req.body as Record<string, unknown>;
+  const newName = ((item.name as string) ?? '').trim().toLowerCase();
+  if (newName && items.some((c) => ((c.name as string) ?? '').trim().toLowerCase() === newName)) {
+    return res.status(409).json({ error: `Кіт з іменем "${item.name}" вже існує` });
+  }
+  items.push(item);
+  writeData('cats', items);
+  const label = collectionName['cats'] ?? 'cats';
+  const name = (item.name as string) || String(item.id ?? '');
+  writeLog(req, 'create', 'cats', item.id as string, `${label} створено: ${name}`, { snapshot: item });
+  res.json(item);
+});
+
+app.put('/api/cats/:id', requireWrite('cats'), (req, res) => {
+  const items = readData('cats') as Record<string, unknown>[];
+  const idx = items.findIndex((i) => i.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  const before = items[idx] as Record<string, unknown>;
+  const newName = ((req.body.name as string) ?? '').trim().toLowerCase();
+  if (newName && items.some((c, i) => i !== idx && ((c.name as string) ?? '').trim().toLowerCase() === newName)) {
+    return res.status(409).json({ error: `Кіт з іменем "${req.body.name}" вже існує` });
+  }
+  const merged = { ...before, ...req.body };
+  for (const key of Object.keys(req.body)) {
+    if (req.body[key] === '' || req.body[key] === null) delete merged[key];
+  }
+  items[idx] = merged;
+  writeData('cats', items);
+  const label = collectionName['cats'] ?? 'cats';
+  const name = (merged.name as string) || String(merged.id ?? '');
+  const changes = buildDiff(before, req.body as Record<string, unknown>);
+  writeLog(req, 'update', 'cats', req.params.id, `${label} оновлено: ${name}`, { changes });
+  res.json(items[idx]);
+});
+
 // Generic CRUD routes for each collection
 const collections = ['cats', 'records', 'weights', 'users', 'visits', 'shifts'];
 
@@ -269,36 +307,40 @@ for (const col of collections) {
   // Users collection is always admin-only for writes
   const writeMiddleware = col === 'users' ? requireAdmin : requireWrite(col);
 
-  // POST (add one)
-  app.post(`/api/${col}`, writeMiddleware, (req, res) => {
-    const items = readData(col) as Record<string, unknown>[];
-    const item = req.body as Record<string, unknown>;
-    items.push(item);
-    writeData(col, items);
-    const label = collectionName[col] ?? col;
-    const name = (item.name as string) || (item.title as string) || String(item.id ?? '');
-    writeLog(req, 'create', col, item.id as string, `${label} створено: ${name}`, { snapshot: item });
-    res.json(item);
-  });
+  // POST (add one) — cats have a dedicated handler above with unique-name check
+  if (col !== 'cats') {
+    app.post(`/api/${col}`, writeMiddleware, (req, res) => {
+      const items = readData(col) as Record<string, unknown>[];
+      const item = req.body as Record<string, unknown>;
+      items.push(item);
+      writeData(col, items);
+      const label = collectionName[col] ?? col;
+      const name = (item.name as string) || (item.title as string) || String(item.id ?? '');
+      writeLog(req, 'create', col, item.id as string, `${label} створено: ${name}`, { snapshot: item });
+      res.json(item);
+    });
+  }
 
-  // PUT (replace one by id)
-  app.put(`/api/${col}/:id`, writeMiddleware, (req, res) => {
-    const items = readData(col) as Record<string, unknown>[];
-    const idx = items.findIndex((i) => i.id === req.params.id);
-    if (idx === -1) return res.status(404).json({ error: 'Not found' });
-    const before = items[idx] as Record<string, unknown>;
-    const merged = { ...before, ...req.body };
-    for (const key of Object.keys(req.body)) {
-      if (req.body[key] === '' || req.body[key] === null) delete merged[key];
-    }
-    items[idx] = merged;
-    writeData(col, items);
-    const label = collectionName[col] ?? col;
-    const name = (merged.name as string) || (merged.title as string) || String(merged.id ?? '');
-    const changes = buildDiff(before, req.body as Record<string, unknown>);
-    writeLog(req, 'update', col, req.params.id, `${label} оновлено: ${name}`, { changes });
-    res.json(items[idx]);
-  });
+  // PUT (replace one by id) — cats have a dedicated handler above with unique-name check
+  if (col !== 'cats') {
+    app.put(`/api/${col}/:id`, writeMiddleware, (req, res) => {
+      const items = readData(col) as Record<string, unknown>[];
+      const idx = items.findIndex((i) => i.id === req.params.id);
+      if (idx === -1) return res.status(404).json({ error: 'Not found' });
+      const before = items[idx] as Record<string, unknown>;
+      const merged = { ...before, ...req.body };
+      for (const key of Object.keys(req.body)) {
+        if (req.body[key] === '' || req.body[key] === null) delete merged[key];
+      }
+      items[idx] = merged;
+      writeData(col, items);
+      const label = collectionName[col] ?? col;
+      const name = (merged.name as string) || (merged.title as string) || String(merged.id ?? '');
+      const changes = buildDiff(before, req.body as Record<string, unknown>);
+      writeLog(req, 'update', col, req.params.id, `${label} оновлено: ${name}`, { changes });
+      res.json(items[idx]);
+    });
+  }
 
   // DELETE one by id
   app.delete(`/api/${col}/:id`, writeMiddleware, (req, res) => {
