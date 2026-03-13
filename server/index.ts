@@ -149,6 +149,23 @@ const collectionName: Record<string, string> = {
   shifts: 'Зміна',
 };
 
+// ── Role-based authorization middleware ─────────────────────────────────────
+function getRoleFromReq(req: express.Request): string | null {
+  const token = getTokenFromReq(req);
+  if (!token) return null;
+  const rec = findByToken(token);
+  return rec ? rec.role : null;
+}
+
+function requireAdmin(req: express.Request, res: express.Response, next: express.NextFunction): void {
+  const role = getRoleFromReq(req);
+  if (role !== 'admin') {
+    res.status(403).json({ error: 'Forbidden: admin access required' });
+    return;
+  }
+  next();
+}
+
 // Generic CRUD routes for each collection
 const collections = ['cats', 'records', 'weights', 'users', 'visits', 'shifts'];
 
@@ -158,8 +175,8 @@ for (const col of collections) {
     res.json(readData(col));
   });
 
-  // POST (add one)
-  app.post(`/api/${col}`, (req, res) => {
+  // POST (add one) — admin only
+  app.post(`/api/${col}`, requireAdmin, (req, res) => {
     const items = readData(col) as Record<string, unknown>[];
     const item = req.body as Record<string, unknown>;
     items.push(item);
@@ -170,8 +187,8 @@ for (const col of collections) {
     res.json(item);
   });
 
-  // PUT (replace one by id)
-  app.put(`/api/${col}/:id`, (req, res) => {
+  // PUT (replace one by id) — admin only
+  app.put(`/api/${col}/:id`, requireAdmin, (req, res) => {
     const items = readData(col) as Record<string, unknown>[];
     const idx = items.findIndex((i) => i.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'Not found' });
@@ -189,8 +206,8 @@ for (const col of collections) {
     res.json(items[idx]);
   });
 
-  // DELETE one by id
-  app.delete(`/api/${col}/:id`, (req, res) => {
+  // DELETE one by id — admin only
+  app.delete(`/api/${col}/:id`, requireAdmin, (req, res) => {
     const items = readData(col) as Record<string, unknown>[];
     const item = items.find((i) => i.id === req.params.id) as Record<string, unknown> | undefined;
     const filtered = items.filter((i) => i.id !== req.params.id);
@@ -202,8 +219,8 @@ for (const col of collections) {
   });
 }
 
-// Bulk migration endpoint — imports data from localStorage export, skips duplicates
-app.post('/api/migrate', (req, res) => {
+// Bulk migration endpoint — admin only
+app.post('/api/migrate', requireAdmin, (req, res) => {
   const { cats = [], records = [], weights = [] } = req.body as {
     cats?: Record<string, unknown>[];
     records?: Record<string, unknown>[];
@@ -259,8 +276,8 @@ if (readData('users').length === 0) {
   writeData('users', DEFAULT_USERS);
 }
 
-// Logs endpoint
-app.get('/api/logs', (_req, res) => {
+// Logs endpoint — admin only
+app.get('/api/logs', requireAdmin, (_req, res) => {
   res.json(readData('logs'));
 });
 

@@ -53,8 +53,9 @@ export default function CatCard({ cat }: CatCardProps) {
         <div className="flex items-center gap-3">
           <CatAvatar cat={cat} size="md" />
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-800 text-base truncate">
-              {cat.name} <span className="text-gray-400">{cat.sex === 'male' ? '♂' : '♀'}</span>
+            <h3 className="font-semibold text-gray-800 text-base flex items-center gap-1 min-w-0">
+              <span className="truncate">{cat.name}</span>
+              <span className="text-gray-400 shrink-0">{cat.sex === 'male' ? '♂' : '♀'}</span>
             </h3>
             {cat.birthDate && <p className="text-xs text-gray-400 leading-tight">{formatAge(cat.birthDate)}</p>}
             {cat.color && <p className="text-xs text-gray-400 leading-tight">{cat.color}</p>}

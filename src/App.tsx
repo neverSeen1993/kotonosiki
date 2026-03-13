@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import AppShell from './components/layout/AppShell';
 import RequireAuth from './components/auth/RequireAuth';
 import LoginPage from './pages/LoginPage';
@@ -12,6 +12,13 @@ import AdoptedPage from './pages/AdoptedPage';
 import VisitsPage from './pages/VisitsPage';
 import ShiftsPage from './pages/ShiftsPage';
 import NotFoundPage from './pages/NotFoundPage';
+import { useAuth } from './hooks/useAuth';
+
+function RequireAdmin({ children }: { children: React.ReactNode }) {
+  const { isAdmin } = useAuth();
+  if (!isAdmin) return <Navigate to="/" replace />;
+  return <>{children}</>;
+}
 
 export default function App() {
   return (
@@ -31,7 +38,7 @@ export default function App() {
                 <Route path="/adopted" element={<AdoptedPage />} />
                 <Route path="/visits" element={<VisitsPage />} />
                 <Route path="/shifts" element={<ShiftsPage />} />
-                <Route path="/log" element={<LogPage />} />
+                <Route path="/log" element={<RequireAdmin><LogPage /></RequireAdmin>} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </AppShell>

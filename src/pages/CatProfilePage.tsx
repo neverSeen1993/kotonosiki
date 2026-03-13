@@ -157,8 +157,9 @@ export default function CatProfilePage() {
                     <span className="text-teal-600 font-medium">({daysSince(cat.arrivalDate)} дн.)</span>
                   </span>
                 )}
-                <span>
-                  <span className="font-medium">Стать:</span> {cat.sex === 'male' ? '♂ Кіт' : '♀ Киця'}
+                <span className="inline-flex items-center gap-1">
+                  <span className="font-medium">Стать:</span>
+                  <span>{cat.sex === 'male' ? '♂ Кіт' : '♀ Киця'}</span>
                 </span>
                 <span>
                   <span className="font-medium">Колір:</span> {cat.color}
