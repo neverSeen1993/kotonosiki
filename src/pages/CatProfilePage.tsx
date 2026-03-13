@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Cat } from '../types';
 import CatAvatar from '../components/cats/CatAvatar';
 import CatForm from '../components/cats/CatForm';
+import AdoptionForm from '../components/cats/AdoptionForm';
 import RecordList from '../components/records/RecordList';
 import WeightLog from '../components/cats/WeightLog';
 import Modal from '../components/ui/Modal';
@@ -25,12 +26,13 @@ type Tab = 'procedures' | 'vaccinations' | 'appointments' | 'treatment' | 'weigh
 export default function CatProfilePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getCatById, updateCat, deleteCat } = useCatsStore();
+  const { getCatById, updateCat, updateCatAdoption, deleteCat } = useCatsStore();
   const { deleteRecordsByCat, getRecordsByCat, updateRecord } = useRecordsStore();
   const { deleteWeightsByCat } = useWeightStore();
-  const { canEdit } = useAuth();
+  const { canEdit, canEditAdoption } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('procedures');
   const [showEdit, setShowEdit] = useState(false);
+  const [showEditAdoption, setShowEditAdoption] = useState(false);
 
   const cat = getCatById(id!);
 
@@ -60,6 +62,25 @@ export default function CatProfilePage() {
     }
 
     setShowEdit(false);
+  };
+
+  const handleUpdateAdoption = async (data: { adoption: Cat['adoption']; adoptionNotes?: string }) => {
+    const wasAdopted = !!cat.adoption?.date;
+    const nowAdopted = !!data.adoption?.date;
+
+    await updateCatAdoption(cat.id, data);
+
+    if (!wasAdopted && nowAdopted) {
+      const records = getRecordsByCat(cat.id);
+      const toCancel = records.filter(
+        (r) => r.status === 'scheduled' || r.status === 'ongoing',
+      );
+      await Promise.all(
+        toCancel.map((r) => updateRecord(r.id, { status: 'cancelled' })),
+      );
+    }
+
+    setShowEditAdoption(false);
   };
 
   const handleDelete = async () => {
@@ -283,9 +304,19 @@ export default function CatProfilePage() {
       {/* Adoption */}
       {cat.adoption?.date || cat.adoption?.from ? (
         <div className="card mb-6 p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <Home size={15} className="text-teal-500" />
-            <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Адопція</h2>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Home size={15} className="text-teal-500" />
+              <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Адопція</h2>
+            </div>
+            {canEditAdoption && (
+              <button
+                onClick={() => setShowEditAdoption(true)}
+                className="btn-secondary text-xs py-1 px-2"
+              >
+                <Edit2 size={12} /> Редагувати
+              </button>
+            )}
           </div>
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500">
             {cat.adoption.date && (
@@ -315,6 +346,19 @@ export default function CatProfilePage() {
               </span>
             )}
           </div>
+        </div>
+      ) : canEditAdoption ? (
+        <div className="card mb-6 p-4 border-dashed border-2 border-gray-200 flex items-center justify-between text-gray-400 text-sm">
+          <div className="flex items-center gap-3">
+            <Home size={15} className="text-gray-300" />
+            Адопція не заповнена
+          </div>
+          <button
+            onClick={() => setShowEditAdoption(true)}
+            className="btn-secondary text-xs py-1 px-2"
+          >
+            <Edit2 size={12} /> Додати
+          </button>
         </div>
       ) : null}
 
@@ -347,6 +391,12 @@ export default function CatProfilePage() {
       {canEdit && showEdit && (
         <Modal title={`Редагувати ${cat.name}`} onClose={() => setShowEdit(false)}>
           <CatForm initialData={cat} onSubmit={handleUpdate} onCancel={() => setShowEdit(false)} />
+        </Modal>
+      )}
+
+      {canEditAdoption && showEditAdoption && (
+        <Modal title={`Адопція — ${cat.name}`} onClose={() => setShowEditAdoption(false)}>
+          <AdoptionForm initialData={cat} onSubmit={handleUpdateAdoption} onCancel={() => setShowEditAdoption(false)} />
         </Modal>
       )}
     </div>

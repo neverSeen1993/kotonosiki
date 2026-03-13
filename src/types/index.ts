@@ -81,7 +81,22 @@ export interface MedicalRecord {
   createdAt: string;
 }
 
-export type UserRole = 'admin' | 'helper' | 'viewer';
+export type UserRole = 'admin' | 'helper' | 'viewer' | 'nanny';
+
+export type PageAccess = 'hidden' | 'view' | 'edit';
+
+export interface PagePermissions {
+  catalog: PageAccess;
+  catProfile: PageAccess;
+  appointments: PageAccess;
+  treatments: PageAccess;
+  scheduled: PageAccess;
+  adopted: PageAccess;
+  visits: PageAccess;
+  shifts: PageAccess;
+  log: PageAccess;
+  nannies: PageAccess;
+}
 
 export interface WeightEntry {
   id: string;
@@ -98,6 +113,7 @@ export interface User {
   login: string;
   passwordHash: string; // simple btoa hash — good enough for a local app
   role: UserRole;
+  nannyId?: string;     // reference to Catnanny record when role === 'nanny'
   createdAt: string;
 }
 
@@ -105,6 +121,8 @@ export interface AuthSession {
   userId: string;
   role: UserRole;
   name: string;
+  permissions?: PagePermissions;  // present for nanny role
+  nannyId?: string;               // present for nanny role
 }
 
 export interface Visit {
@@ -150,5 +168,43 @@ export interface LogEntry {
   details: string;
   changes?: FieldChange[];
   snapshot?: Record<string, unknown>;
+}
+
+
+export const ALL_PAGES: { key: keyof PagePermissions; label: string }[] = [
+  { key: 'catalog', label: 'КОТО-табір' },
+  { key: 'catProfile', label: 'Профіль кота' },
+  { key: 'appointments', label: 'Прийоми' },
+  { key: 'treatments', label: 'Лікування' },
+  { key: 'scheduled', label: 'Заплановані маніпуляції' },
+  { key: 'adopted', label: 'Прилаштовані' },
+  { key: 'visits', label: 'Графік відвідувань' },
+  { key: 'shifts', label: 'Графік котонянь' },
+  { key: 'log', label: 'Історія' },
+  { key: 'nannies', label: 'Котоняні' },
+];
+
+export const DEFAULT_PERMISSIONS: PagePermissions = {
+  catalog: 'view',
+  catProfile: 'view',
+  appointments: 'view',
+  treatments: 'view',
+  scheduled: 'view',
+  adopted: 'view',
+  visits: 'view',
+  shifts: 'view',
+  log: 'hidden',
+  nannies: 'hidden',
+};
+
+export interface Catnanny {
+  id: string;
+  name: string;
+  phone?: string;
+  notes?: string;
+  login?: string;
+  passwordHash?: string;
+  permissions: PagePermissions;
+  createdAt: string;
 }
 

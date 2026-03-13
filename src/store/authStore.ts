@@ -1,10 +1,11 @@
 import { create } from 'zustand';
-import { AuthSession, UserRole } from '../types';
+import { AuthSession, UserRole, PagePermissions } from '../types';
 
 interface AuthState {
   session: AuthSession | null;
   isAuthenticated: boolean;
   role: UserRole | null;
+  permissions: PagePermissions | null;
   init: () => Promise<void>;
   login: (login: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
@@ -14,6 +15,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   session: null,
   isAuthenticated: false,
   role: null,
+  permissions: null,
 
   init: async () => {
     try {
@@ -24,8 +26,10 @@ export const useAuthStore = create<AuthState>((set) => ({
         userId: data.userId,
         role: data.role,
         name: data.name,
+        permissions: data.permissions,
+        nannyId: data.nannyId,
       };
-      set({ session, isAuthenticated: true, role: data.role });
+      set({ session, isAuthenticated: true, role: data.role, permissions: data.permissions ?? null });
     } catch {
       // server unreachable
     }
@@ -46,8 +50,10 @@ export const useAuthStore = create<AuthState>((set) => ({
         userId: data.userId,
         role: data.role,
         name: data.name,
+        permissions: data.permissions,
+        nannyId: data.nannyId,
       };
-      set({ session, isAuthenticated: true, role: data.role });
+      set({ session, isAuthenticated: true, role: data.role, permissions: data.permissions ?? null });
       return true;
     } catch {
       return false;
@@ -61,6 +67,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         credentials: 'include',
       });
     } catch { /* ignore */ }
-    set({ session: null, isAuthenticated: false, role: null });
+    set({ session: null, isAuthenticated: false, role: null, permissions: null });
   },
 }));

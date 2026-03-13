@@ -11,12 +11,16 @@ import LogPage from './pages/LogPage';
 import AdoptedPage from './pages/AdoptedPage';
 import VisitsPage from './pages/VisitsPage';
 import ShiftsPage from './pages/ShiftsPage';
+import NanniesPage from './pages/NanniesPage';
 import NotFoundPage from './pages/NotFoundPage';
 import { useAuth } from './hooks/useAuth';
+import { PagePermissions } from './types';
 
-function RequireAdmin({ children }: { children: React.ReactNode }) {
-  const { isAdmin } = useAuth();
-  if (!isAdmin) return <Navigate to="/" replace />;
+
+function RequirePageAccess({ page, children }: { page: keyof PagePermissions; children: React.ReactNode }) {
+  const { canViewPage, isAdmin } = useAuth();
+  if (isAdmin) return <>{children}</>;
+  if (!canViewPage(page)) return <Navigate to="/" replace />;
   return <>{children}</>;
 }
 
@@ -38,7 +42,8 @@ export default function App() {
                 <Route path="/adopted" element={<AdoptedPage />} />
                 <Route path="/visits" element={<VisitsPage />} />
                 <Route path="/shifts" element={<ShiftsPage />} />
-                <Route path="/log" element={<RequireAdmin><LogPage /></RequireAdmin>} />
+                <Route path="/nannies" element={<RequirePageAccess page="nannies"><NanniesPage /></RequirePageAccess>} />
+                <Route path="/log" element={<RequirePageAccess page="log"><LogPage /></RequirePageAccess>} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </AppShell>

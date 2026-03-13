@@ -9,6 +9,7 @@ interface CatsState {
   loadCats: () => Promise<void>;
   addCat: (cat: Omit<Cat, 'id' | 'createdAt'>) => Promise<Cat>;
   updateCat: (id: string, updates: Partial<Omit<Cat, 'id' | 'createdAt'>>) => Promise<void>;
+  updateCatAdoption: (id: string, updates: Pick<Partial<Cat>, 'adoption' | 'adoptionNotes'>) => Promise<void>;
   deleteCat: (id: string) => Promise<void>;
   getCatById: (id: string) => Cat | undefined;
 }
@@ -36,6 +37,22 @@ export const useCatsStore = create<CatsState>((set, get) => ({
         if (c.id !== id) return c;
         const merged = { ...c, ...updates };
         // Remove keys explicitly set to null (cleared fields)
+        for (const key of Object.keys(updates)) {
+          if ((updates as Record<string, unknown>)[key] === null) {
+            delete (merged as Record<string, unknown>)[key];
+          }
+        }
+        return merged as Cat;
+      }),
+    });
+  },
+
+  updateCatAdoption: async (id, updates) => {
+    await api.put(`/cats/${id}/adoption`, updates);
+    set({
+      cats: get().cats.map((c) => {
+        if (c.id !== id) return c;
+        const merged = { ...c, ...updates };
         for (const key of Object.keys(updates)) {
           if ((updates as Record<string, unknown>)[key] === null) {
             delete (merged as Record<string, unknown>)[key];

@@ -4,6 +4,7 @@ import { useRecordsStore } from '../store/recordsStore';
 import { useWeightStore } from '../store/weightStore';
 import { useVisitStore } from '../store/visitStore';
 import { useShiftStore } from '../store/shiftStore';
+import { useNannyStore } from '../store/nannyStore';
 import { useAuthStore } from '../store/authStore';
 import { migrateFromLocalStorage } from '../utils/migrate';
 
@@ -15,12 +16,13 @@ export default function DataLoader({ children }: { children: React.ReactNode }) 
   const { loadWeights } = useWeightStore();
   const { loadVisits } = useVisitStore();
   const { loadShifts } = useShiftStore();
+  const { loadNannies } = useNannyStore();
   const { init } = useAuthStore();
 
   useEffect(() => {
     Promise.resolve()
       .then(() => migrateFromLocalStorage())
-      .then(() => Promise.all([init(), loadCats(), loadRecords(), loadWeights(), loadVisits(), loadShifts()]))
+      .then(() => Promise.all([init(), loadCats(), loadRecords(), loadWeights(), loadVisits(), loadShifts(), loadNannies()]))
       .then(() => setReady(true))
       .catch(() => setError(true));
   }, []);

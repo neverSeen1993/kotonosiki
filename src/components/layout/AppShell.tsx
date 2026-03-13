@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Cat, LayoutGrid, Calendar, Download, Upload, LogOut, ShieldCheck, Eye, FileSpreadsheet, Stethoscope, ClipboardList, ScrollText, Heart, Users, CalendarClock, Menu, X } from 'lucide-react';
+import { Cat, LayoutGrid, Calendar, Download, Upload, LogOut, ShieldCheck, Eye, FileSpreadsheet, Stethoscope, ClipboardList, ScrollText, Heart, Users, CalendarClock, Menu, X, UserCog } from 'lucide-react';
 import { useRecordsStore } from '../../store/recordsStore';
 import { exportToExcel } from '../../utils/exportExcel';
 import { useCatsStore } from '../../store/catsStore';
@@ -13,7 +13,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const { getUpcomingAppointments, loadRecords, records } = useRecordsStore();
   const { cats, loadCats } = useCatsStore();
   const { loadWeights, weights } = useWeightStore();
-  const { session, isAdmin, canEdit, logout } = useAuth();
+  const { session, isAdmin, isNanny, canEdit, canViewPage, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -77,30 +77,42 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     input.click();
   };
 
-  const navItems = [
-    { to: '/', label: 'КОТО-табір', icon: <LayoutGrid size={18} />, exact: true },
+  const allNavItems = [
+    { to: '/', label: 'КОТО-табір', icon: <LayoutGrid size={18} />, exact: true, page: 'catalog' as const },
     {
       to: '/appointments',
       label: 'Прийоми',
       icon: <Calendar size={18} />,
       badge: overdueCount > 0 ? overdueCount : null,
+      page: 'appointments' as const,
     },
-    { to: '/treatments', label: 'Лікування', icon: <Stethoscope size={18} />, exact: false },
-    { to: '/scheduled', label: 'Заплановані маніпуляції', icon: <ClipboardList size={18} />, exact: false },
-    { to: '/adopted', label: 'Прилаштовані', icon: <Heart size={18} />, exact: false },
-    { to: '/visits', label: 'Графік відвідувань', icon: <Users size={18} />, exact: false },
-    { to: '/shifts', label: 'Графік котонянь', icon: <CalendarClock size={18} />, exact: false },
-    ...(isAdmin ? [{ to: '/log', label: 'Історія', icon: <ScrollText size={18} />, exact: false }] : []),
+    { to: '/treatments', label: 'Лікування', icon: <Stethoscope size={18} />, exact: false, page: 'treatments' as const },
+    { to: '/scheduled', label: 'Заплановані маніпуляції', icon: <ClipboardList size={18} />, exact: false, page: 'scheduled' as const },
+    { to: '/adopted', label: 'Прилаштовані', icon: <Heart size={18} />, exact: false, page: 'adopted' as const },
+    { to: '/visits', label: 'Графік відвідувань', icon: <Users size={18} />, exact: false, page: 'visits' as const },
+    { to: '/shifts', label: 'Графік котонянь', icon: <CalendarClock size={18} />, exact: false, page: 'shifts' as const },
+    { to: '/nannies', label: 'Котоняні', icon: <UserCog size={18} />, exact: false, page: 'nannies' as const },
+    { to: '/log', label: 'Історія', icon: <ScrollText size={18} />, exact: false, page: 'log' as const },
   ];
+
+  const navItems = allNavItems.filter((item) => {
+    // Admin sees everything
+    if (isAdmin) return true;
+    // Nanny uses per-page permissions
+    if (isNanny) return canViewPage(item.page);
+    // Helper / viewer: hide admin-only pages
+    if (item.page === 'log' || item.page === 'nannies') return false;
+    return true;
+  });
 
   const RoleBadge = () => (
     <span
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-        isAdmin ? 'bg-teal-100 text-teal-700' : canEdit ? 'bg-amber-100 text-amber-700' : 'bg-purple-100 text-purple-700'
+        isAdmin ? 'bg-teal-100 text-teal-700' : isNanny ? 'bg-orange-100 text-orange-700' : canEdit ? 'bg-amber-100 text-amber-700' : 'bg-purple-100 text-purple-700'
       }`}
     >
       {isAdmin ? <ShieldCheck size={11} /> : <Eye size={11} />}
-      {isAdmin ? 'Адмін' : canEdit ? 'Помічник' : 'Adoption Guard'}
+      {isAdmin ? 'Адмін' : isNanny ? 'Котоняня' : canEdit ? 'Помічник' : 'Adoption Guard'}
     </span>
   );
 
